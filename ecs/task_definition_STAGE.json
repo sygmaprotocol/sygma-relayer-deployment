@@ -1,0 +1,55 @@
+{
+    "containerDefinitions": [ 
+       { 
+          "essential": true,
+          "image": "<YOUR_AWS_ACCOUNT_ID>.dkr.ecr.<REGION.amazonaws.com/relayer-<ENV>:<ENV>",
+          "logConfiguration": { 
+             "logDriver": "awslogs",
+             "options": { 
+                "awslogs-group": "/ecs/relayer-<ENV>",
+                "awslogs-region": "<REGION",
+                "awslogs-stream-prefix": "ecs"
+             }
+          },
+          "command": [
+            "run --config /cfg/config_evm-evm_1.json --testkey alice --fresh"
+          ],      
+          "name": "relayer-container-<ENV>",
+          "portMappings": [ 
+             { 
+                "containerPort": 9000,
+                "hostPort": 9000,
+                "protocol": "tcp"
+             },
+             { 
+              "containerPort": 80,
+              "hostPort": 80,
+              "protocol": "tcp"
+           }
+          ],
+          "environment": [
+           {
+              "name": "ENV_EXAMPLE",
+              "value": "example"
+           }
+          ],
+          "secrets": [ 
+             { 
+                "name": "SECRET_EXAMPLE",
+                "valueFrom": "arn:aws:ssm:<REGION:<YOUR_AWS_ACCOUNT_ID>:parameter/chainbridge/example"
+             }
+          ]
+       }
+    ],
+    "cpu": "256",
+    "executionRoleArn": "arn:aws:iam::<YOUR_AWS_ACCOUNT_ID>:role/relayer-ecsTaskExecutionRole",
+    "family": "relayer-container-<ENV>",
+    "memory": "512",
+    "networkMode": "awsvpc",
+    "runtimePlatform": {
+         "operatingSystemFamily": "LINUX"
+     },
+    "requiresCompatibilities": [ 
+        "FARGATE" 
+     ]
+  }
