@@ -1,4 +1,4 @@
-# Chaibridge Hub Deployment
+# Sygma relyaer Deployment
 
 ## Setup AWS account
 
