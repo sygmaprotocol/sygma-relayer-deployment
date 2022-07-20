@@ -51,7 +51,7 @@ The configuration for the relayers is in the folder `ecs`. For ECS we configure 
 
 You can create any number of relayers. For each one, you're going to need a Task Definition.
 
-## How to use AWS SSM to setup private vatiables (Private key, api keys, etc)
+## How to use AWS SSM to setup private variables (Private key, api keys, etc)
 
 We use SSM to hold all of our secrets. To access it, go to your AWS Account, in the Search bar type `SSM`. Go into the Systems Manager Service. On the left side menu, go into Parameter Store.
 Now you can create any secrets that you want, and then reference it in the `secrets` section in the Task Definition.
