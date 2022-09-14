@@ -12,10 +12,6 @@ variable "project_name" {
   type = string
 }
 
-variable "number_of_relayers" {
-  type = number
-}
-
 variable "app_container_port" {
   type = number
 }
@@ -25,18 +21,6 @@ variable "app_image" {
 }
 
 variable "app_tag" {
-  type = string
-}
-
-variable "domain_name" {
-  type = string
-}
-
-variable "name_public_subnets" {
-  type = string
-}
-
-variable "name_private_subnets" {
   type = string
 }
 
@@ -110,4 +94,14 @@ variable "app_max_capacity" {
 variable "log_retention_days" {
   type    = number
   default = 7
+}
+
+variable "enable_ecr" {
+  type = bool
+  default = false
+}
+
+variable "deployment_minimum_healthy_percent" {
+  type = number
+  default = 0
 }
