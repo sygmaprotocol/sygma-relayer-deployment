@@ -6,21 +6,7 @@ resource "aws_lb" "main" {
 
   enable_deletion_protection = var.lb_delete_protection
 
-  dynamic "subnet_mapping" {
-    for_each = toset(data.aws_subnets.ec2_public_subnets.ids)
-    content {
-      subnet_id     = subnet_mapping.value
-      allocation_id = aws_eip.lb[subnet_mapping.key].allocation_id
-    }
-  }
-}
-
-resource "aws_eip" "lb" {
-  for_each = toset(data.aws_subnets.ec2_public_subnets.ids)
-  vpc      = true
-  tags = {
-    Name = "${var.project_name}-${var.env}"
-  }
+  subnets  = data.aws_subnets.ec2_public_subnets.ids
 }
 
 resource "aws_lb_target_group" "http" {

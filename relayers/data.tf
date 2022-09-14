@@ -12,7 +12,7 @@ data "aws_subnets" "ec2_private_subnets" {
 
   filter {
     name   = "tag:Name"
-    values = [var.name_public_subnets]
+    values = ["chainbridge-private-subnet"]
   }
 }
 
@@ -24,11 +24,11 @@ data "aws_subnets" "ec2_public_subnets" {
 
   filter {
     name   = "tag:Name"
-    values = [var.name_public_subnets]
+    values = ["chainbridge-public-subnet"]
   }
 }
 
 data "aws_acm_certificate" "chainsafe_io" {
-  domain   = var.domain_name
+  domain   = "*.chainsafe.io"
   statuses = ["ISSUED"]
 }

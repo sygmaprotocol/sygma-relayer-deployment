@@ -1,4 +1,5 @@
 resource "aws_ecr_repository" "main" {
+  count = var.enable_ecr ? 1 : 0
   name                 = lower("${var.project_name}-${var.env}")
   image_tag_mutability = "MUTABLE"
 
@@ -12,7 +13,8 @@ resource "aws_ecr_repository" "main" {
 }
 
 resource "aws_ecr_lifecycle_policy" "main" {
-  repository = aws_ecr_repository.main.name
+  count = var.enable_ecr ? 1 : 0
+  repository = aws_ecr_repository.main[count.index].name
 
   policy = jsonencode({
     rules = [{

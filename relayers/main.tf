@@ -5,6 +5,13 @@ terraform {
       version = "4.5.0"
     }
   }
+  backend "remote" {
+    organization = "ChainSafe"
+
+    workspaces {
+      prefix = "chainbridge-relayer-"
+    }
+  }
 }
 
 // Configure the AWS Provider

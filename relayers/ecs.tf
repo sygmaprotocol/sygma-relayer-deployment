@@ -1,14 +1,16 @@
 resource "aws_ecs_cluster" "main" {
-  name = "${var.project_name}-${var.env}"
+  name = "relayer-${var.env}"
   tags = {
-    Name = var.project_name
+    Name = "relayer-${var.env}"
   }
 }
 
 resource "aws_ecs_task_definition" "main" {
-  count                    = var.number_of_relayers
+  depends_on = [
+    aws_ecs_cluster.main
+  ]
   network_mode             = "awsvpc"
-  family                   = "service-${count.index}"
+  family                   = "service-${var.project_name}"
   requires_compatibilities = ["FARGATE"]
   cpu                      = var.app_cpu_usage
   memory                   = var.app_memory_usage
@@ -43,18 +45,20 @@ resource "aws_ecs_task_definition" "main" {
 }
 
 resource "aws_ecs_service" "main" {
-  count                              = var.number_of_relayers
-  name                               = "${var.project_name}-service-${var.env}-${count.index}"
-  cluster                            = aws_ecs_cluster.main.id
+  depends_on = [
+    aws_ecs_cluster.main
+  ]
+  name                               = "${var.project_name}-service-${var.env}"
+  cluster                            = "arn:aws:ecs:us-east-2:852551629426:cluster/relayer-STAGE"
   desired_count                      = 1
-  deployment_minimum_healthy_percent = 50
+  deployment_minimum_healthy_percent = var.deployment_minimum_healthy_percent
   deployment_maximum_percent         = 200
-  task_definition                    = aws_ecs_task_definition.main[count.index].arn
+  task_definition                    = aws_ecs_task_definition.main.arn
   launch_type                        = "FARGATE"
   scheduling_strategy                = "REPLICA"
 
   service_registries {
-    registry_arn   = aws_service_discovery_service.ecs-service-discovery[count.index].arn
+    registry_arn   = aws_service_discovery_service.ecs-service-discovery.arn
     container_name = "${var.project_name}-container-${var.env}"
   }
   network_configuration {
@@ -81,17 +85,15 @@ resource "aws_ecs_service" "main" {
 }
 
 resource "aws_service_discovery_private_dns_namespace" "ecs-service-namespace" {
-  count       = var.number_of_relayers
-  name        = "${var.project_name}-${count.index}"
+  name        = "${var.project_name}-${var.env}"
   description = "${var.project_name} ${var.env} namespace"
   vpc         = data.aws_vpc.vpc.id
 }
 resource "aws_service_discovery_service" "ecs-service-discovery" {
-  count = var.number_of_relayers
-  name  = "${var.project_name}-${count.index}"
+  name  = "${var.project_name}"
 
   dns_config {
-    namespace_id = aws_service_discovery_private_dns_namespace.ecs-service-namespace[count.index].id
+    namespace_id = aws_service_discovery_private_dns_namespace.ecs-service-namespace.id
 
     dns_records {
       ttl  = 10
@@ -107,21 +109,19 @@ resource "aws_service_discovery_service" "ecs-service-discovery" {
 }
 
 resource "aws_appautoscaling_target" "ecs_target" {
-  count              = var.number_of_relayers
   max_capacity       = var.app_max_capacity
   min_capacity       = 1
-  resource_id        = "service/${aws_ecs_cluster.main.name}/${aws_ecs_service.main[count.index].name}"
+  resource_id        = "service/arn:aws:ecs:us-east-2:852551629426:cluster/relayer-STAGE/${aws_ecs_service.main.name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
 }
 
 resource "aws_appautoscaling_policy" "ecs_policy_memory" {
-  count              = var.number_of_relayers
   name               = "memory-autoscaling"
   policy_type        = "TargetTrackingScaling"
-  resource_id        = aws_appautoscaling_target.ecs_target[count.index].resource_id
-  scalable_dimension = aws_appautoscaling_target.ecs_target[count.index].scalable_dimension
-  service_namespace  = aws_appautoscaling_target.ecs_target[count.index].service_namespace
+  resource_id        = aws_appautoscaling_target.ecs_target.resource_id
+  scalable_dimension = aws_appautoscaling_target.ecs_target.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.ecs_target.service_namespace
 
   target_tracking_scaling_policy_configuration {
     predefined_metric_specification {
@@ -132,12 +132,11 @@ resource "aws_appautoscaling_policy" "ecs_policy_memory" {
 }
 
 resource "aws_appautoscaling_policy" "ecs_policy_cpu" {
-  count              = var.number_of_relayers
   name               = "cpu-autoscaling"
   policy_type        = "TargetTrackingScaling"
-  resource_id        = aws_appautoscaling_target.ecs_target[count.index].resource_id
-  scalable_dimension = aws_appautoscaling_target.ecs_target[count.index].scalable_dimension
-  service_namespace  = aws_appautoscaling_target.ecs_target[count.index].service_namespace
+  resource_id        = aws_appautoscaling_target.ecs_target.resource_id
+  scalable_dimension = aws_appautoscaling_target.ecs_target.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.ecs_target.service_namespace
 
   target_tracking_scaling_policy_configuration {
     predefined_metric_specification {
