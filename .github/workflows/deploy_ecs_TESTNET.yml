@@ -31,7 +31,7 @@ jobs:
       - name: render jinja2 templates to task definition json files
         uses: cuchi/jinja2-action@v1.2.0
         with:
-          template: 'ecs/task_definition-${{ env.ENVIRONMENT }}.j2'
+          template: 'ecs/task_definition_${{ env.ENVIRONMENT }}.j2'
           output_file: 'ecs/task_definition-${{ matrix.relayer_id }}_${{ env.ENVIRONMENT }}.json'
           data_format: json
           variables: |
@@ -44,7 +44,7 @@ jobs:
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: arn:aws:iam::${{ env.AWS_TESTNET }}:role/github-actions-${{ env.ENVIRONMENT }}-chainbridge
+          role-to-assume: arn:aws:iam::${{ env.AWS_TESTNET }}:role/github-actions-SDLC
           aws-region: ${{ env.AWS_REGION }}
           role-session-name: GithubActions
 
@@ -52,6 +52,6 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: 'ecs/task_definition-${{ matrix.relayer_id }}_${{ env.ENVIRONMENT }}.json'
-          service: 'relayer-${{ matrix.relayer_id }}-service-${{ env.ENVIRONMENT }}'
-          cluster: 'relayer-${{ env.ENVIRONMENT }}'
+          service: '${{ env.PROJECT_NAME }}-${{ matrix.relayer_id }}-service-${{ env.TAG }}'
+          cluster: 'relayer-${{ env.TAG }}'
           wait-for-service-stability: true
