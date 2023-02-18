@@ -2,19 +2,19 @@
     "containerDefinitions": [ 
        { 
           "essential": true,
-          "image": "<YOUR_AWS_ACCOUNT_ID>.dkr.ecr.<REGION.amazonaws.com/relayer-<ENV>:<ENV>",
+          "image": "ghcr.io/sygmaprotocol/sygma-relayer:stable",
           "logConfiguration": { 
              "logDriver": "awslogs",
              "options": { 
-                "awslogs-group": "/ecs/relayer-<ENV>",
-                "awslogs-region": "<REGION",
+                "awslogs-group": "/ecs/{{ relayerName }}-{{ appTag }}",
+                "awslogs-region": "{{ awsRegion }}",
                 "awslogs-stream-prefix": "ecs"
              }
           },
           "command": [
             "run --config /cfg/config_evm-evm_1.json --testkey alice --fresh"
           ],      
-          "name": "relayer-container-<ENV>",
+          "name": "{{ relayerName }}-container-{{ appTag }}",
           "portMappings": [ 
              { 
                 "containerPort": 9000,
@@ -22,8 +22,8 @@
                 "protocol": "tcp"
              },
              { 
-              "containerPort": 80,
-              "hostPort": 80,
+              "containerPort": 9001,
+              "hostPort": 9001,
               "protocol": "tcp"
            }
           ],
@@ -43,7 +43,7 @@
     ],
     "cpu": "256",
     "executionRoleArn": "arn:aws:iam::<YOUR_AWS_ACCOUNT_ID>:role/relayer-ecsTaskExecutionRole",
-    "family": "relayer-container-<ENV>",
+    "family": "{{ relayerName }}-container-{{ appTag }}",
     "memory": "512",
     "networkMode": "awsvpc",
     "runtimePlatform": {

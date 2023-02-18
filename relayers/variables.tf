@@ -1,27 +1,37 @@
 ## Required variables
 
 variable "region" {
-  type = string
-}
-
-variable "env" {
-  type = string
+  type    = string
+  default = "us-east-2"
 }
 
 variable "project_name" {
-  type = string
+  type    = string
+  default = "relayers-choice"
 }
 
+variable "env" {
+  type    = string
+  default = "STAGE"
+}
 variable "app_container_port" {
-  type = number
+  type    = number
+  default = 9000
+}
+
+variable "efs_port" {
+  type    = number
+  default = 2049
 }
 
 variable "app_image" {
-  type = string
+  type    = string
+  default = "relayer-demo"
 }
 
 variable "app_tag" {
-  type = string
+  type    = string
+  default = "Demo"
 }
 
 ## Non-required variables
@@ -97,11 +107,16 @@ variable "log_retention_days" {
 }
 
 variable "enable_ecr" {
-  type = bool
+  type    = bool
   default = false
 }
 
 variable "deployment_minimum_healthy_percent" {
-  type = number
+  type    = number
   default = 0
+}
+
+variable "relayers" {
+  type = number
+  default = 3
 }

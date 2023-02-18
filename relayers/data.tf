@@ -1,6 +1,6 @@
 data "aws_vpc" "vpc" {
   tags = {
-    Env = var.env
+    Name = "${var.project_name}-${lower(var.env)}-vpc"
   }
 }
 
@@ -12,7 +12,7 @@ data "aws_subnets" "ec2_private_subnets" {
 
   filter {
     name   = "tag:Name"
-    values = ["chainbridge-private-subnet"]
+    values = ["${var.project_name}-private-subnet"]
   }
 }
 
@@ -24,7 +24,7 @@ data "aws_subnets" "ec2_public_subnets" {
 
   filter {
     name   = "tag:Name"
-    values = ["chainbridge-public-subnet"]
+    values = ["${var.project_name}-public-subnet"]
   }
 }
 
