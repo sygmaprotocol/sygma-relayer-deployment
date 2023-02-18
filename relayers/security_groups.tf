@@ -1,6 +1,6 @@
 ## ALB Security Group
 resource "aws_security_group" "lb" {
-  name   = "${var.project_name}-sg-alb-${var.env}"
+  name   = "${var.project_name}-sg-alb-${var.app_tag}"
   vpc_id = data.aws_vpc.vpc.id
 
   ingress {
@@ -49,13 +49,13 @@ resource "aws_security_group" "lb" {
 
 ## ECS Task Security Group
 resource "aws_security_group" "ecs_tasks" {
-  name   = "${var.project_name}-sg-task-${var.env}"
+  name   = "${var.project_name}-sg-task-${var.app_tag}"
   vpc_id = data.aws_vpc.vpc.id
 
   ingress {
     protocol    = "tcp"
-    from_port   = var.app_container_port
-    to_port     = var.app_container_port
+    from_port   = 9000
+    to_port     = 9000
     cidr_blocks = ["0.0.0.0/0"]
   }
 

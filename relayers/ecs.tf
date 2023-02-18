@@ -1,16 +1,14 @@
 resource "aws_ecs_cluster" "main" {
-  name = "relayer-${var.env}"
+  name = "relayer-${var.app_tag}"
   tags = {
-    Name = "relayer-${var.env}"
+    Name = "relayer-${var.app_tag}"
   }
 }
 
 resource "aws_ecs_task_definition" "main" {
-  depends_on = [
-    aws_ecs_cluster.main
-  ]
+  count = var.relayers
   network_mode             = "awsvpc"
-  family                   = "service-${var.project_name}"
+  family                   = "${var.project_name}-${count.index}-container-${var.app_tag}"
   requires_compatibilities = ["FARGATE"]
   cpu                      = var.app_cpu_usage
   memory                   = var.app_memory_usage
@@ -19,7 +17,7 @@ resource "aws_ecs_task_definition" "main" {
 
   container_definitions = jsonencode([
     {
-      name      = "${var.project_name}-container-${var.env}"
+      name      = "${var.project_name}-${count.index}-container-${var.app_tag}"
       image     = "${var.app_image}:${var.app_tag}"
       cpu       = var.app_cpu_usage
       memory    = var.app_memory_usage
@@ -45,21 +43,19 @@ resource "aws_ecs_task_definition" "main" {
 }
 
 resource "aws_ecs_service" "main" {
-  depends_on = [
-    aws_ecs_cluster.main
-  ]
-  name                               = "${var.project_name}-service-${var.env}"
-  cluster                            = "arn:aws:ecs:us-east-2:852551629426:cluster/relayer-STAGE"
+  count = var.relayers
+  name                               = "${var.project_name}-${count.index}-service-${var.app_tag}"
+  cluster                            = aws_ecs_cluster.main.id
   desired_count                      = 1
   deployment_minimum_healthy_percent = var.deployment_minimum_healthy_percent
   deployment_maximum_percent         = 200
-  task_definition                    = aws_ecs_task_definition.main.arn
+  task_definition                    = aws_ecs_task_definition.main[count.index].arn
   launch_type                        = "FARGATE"
   scheduling_strategy                = "REPLICA"
 
   service_registries {
-    registry_arn   = aws_service_discovery_service.ecs-service-discovery.arn
-    container_name = "${var.project_name}-container-${var.env}"
+    registry_arn   = aws_service_discovery_service.ecs-service-discovery[count.index].arn
+    container_name = "${var.project_name}-${count.index}-container-${var.app_tag}"
   }
   network_configuration {
     security_groups  = [aws_security_group.ecs_tasks.id]
@@ -68,14 +64,14 @@ resource "aws_ecs_service" "main" {
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.tcp.arn
-    container_name   = "${var.project_name}-container-${var.env}"
+    target_group_arn = aws_lb_target_group.tcp[count.index].arn
+    container_name   = "${var.project_name}-${count.index}-container-${var.app_tag}"
     container_port   = var.app_container_port
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.http.arn
-    container_name   = "${var.project_name}-container-${var.env}"
+    target_group_arn = aws_lb_target_group.http[count.index].arn
+    container_name   = "${var.project_name}-${count.index}-container-${var.app_tag}"
     container_port   = "9001"
   }
 
@@ -85,12 +81,13 @@ resource "aws_ecs_service" "main" {
 }
 
 resource "aws_service_discovery_private_dns_namespace" "ecs-service-namespace" {
-  name        = "${var.project_name}-${var.env}"
-  description = "${var.project_name} ${var.env} namespace"
+  name        = "${var.project_name}-${var.app_tag}"
+  description = "${var.project_name} ${var.app_tag} namespace"
   vpc         = data.aws_vpc.vpc.id
 }
 resource "aws_service_discovery_service" "ecs-service-discovery" {
-  name  = "${var.project_name}"
+  count = var.relayers
+  name = "${var.project_name}-${count.index}"
 
   dns_config {
     namespace_id = aws_service_discovery_private_dns_namespace.ecs-service-namespace.id
@@ -109,19 +106,21 @@ resource "aws_service_discovery_service" "ecs-service-discovery" {
 }
 
 resource "aws_appautoscaling_target" "ecs_target" {
+  count = var.relayers
   max_capacity       = var.app_max_capacity
   min_capacity       = 1
-  resource_id        = "service/arn:aws:ecs:us-east-2:852551629426:cluster/relayer-STAGE/${aws_ecs_service.main.name}"
+  resource_id        = "service/${aws_ecs_cluster.main.name}/${aws_ecs_service.main[count.index].name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
 }
 
 resource "aws_appautoscaling_policy" "ecs_policy_memory" {
+  count = var.relayers
   name               = "memory-autoscaling"
   policy_type        = "TargetTrackingScaling"
-  resource_id        = aws_appautoscaling_target.ecs_target.resource_id
-  scalable_dimension = aws_appautoscaling_target.ecs_target.scalable_dimension
-  service_namespace  = aws_appautoscaling_target.ecs_target.service_namespace
+  resource_id        = aws_appautoscaling_target.ecs_target[count.index].resource_id
+  scalable_dimension = aws_appautoscaling_target.ecs_target[count.index].scalable_dimension
+  service_namespace  = aws_appautoscaling_target.ecs_target[count.index].service_namespace
 
   target_tracking_scaling_policy_configuration {
     predefined_metric_specification {
@@ -132,11 +131,12 @@ resource "aws_appautoscaling_policy" "ecs_policy_memory" {
 }
 
 resource "aws_appautoscaling_policy" "ecs_policy_cpu" {
+  count = var.relayers
   name               = "cpu-autoscaling"
   policy_type        = "TargetTrackingScaling"
-  resource_id        = aws_appautoscaling_target.ecs_target.resource_id
-  scalable_dimension = aws_appautoscaling_target.ecs_target.scalable_dimension
-  service_namespace  = aws_appautoscaling_target.ecs_target.service_namespace
+  resource_id        = aws_appautoscaling_target.ecs_target[count.index].resource_id
+  scalable_dimension = aws_appautoscaling_target.ecs_target[count.index].scalable_dimension
+  service_namespace  = aws_appautoscaling_target.ecs_target[count.index].service_namespace
 
   target_tracking_scaling_policy_configuration {
     predefined_metric_specification {

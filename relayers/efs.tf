@@ -1,6 +1,6 @@
 resource "aws_efs_file_system" "efs" {
   tags = {
-    Name = "${var.project_name}-efs-${var.env}"
+    Name = "${var.project_name}-efs-${var.app_tag}"
   }
 }
 
@@ -17,13 +17,13 @@ resource "aws_efs_mount_target" "main" {
 }
 
 resource "aws_security_group" "efs" {
-  name        = "${var.project_name}-efs-${var.env}"
+  name        = "${var.project_name}-efs-${var.app_tag}"
   description = "Allows NFS traffic from instances within the VPC."
   vpc_id      = data.aws_vpc.vpc.id
 
   ingress {
-    from_port = 2049
-    to_port   = 2049
+    from_port = var.efs_port
+    to_port   = var.efs_port
     protocol  = "tcp"
 
     cidr_blocks = [
@@ -32,8 +32,8 @@ resource "aws_security_group" "efs" {
   }
 
   egress {
-    from_port = 2049
-    to_port   = 2049
+    from_port = var.efs_port
+    to_port   = var.efs_port
     protocol  = "tcp"
 
     cidr_blocks = [
@@ -42,6 +42,6 @@ resource "aws_security_group" "efs" {
   }
 
   tags = {
-    Name = "${var.project_name}-efs-${var.env}"
+    Name = "${var.project_name}-efs-${var.app_tag}"
   }
 }

@@ -2,21 +2,22 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "4.5.0"
+      version = "4.9.0"
     }
   }
-  backend "remote" {
-    organization = "ChainSafe"
+  # backend "remote" {
+  #   organization = "ChainSafe"
 
-    workspaces {
-      prefix = "chainbridge-relayer-"
-    }
-  }
+  #   workspaces {
+  #     prefix = "chainbridge-relayer-"
+  #   }
+  # }
 }
 
 // Configure the AWS Provider
 provider "aws" {
-  region = var.region
+  region  = var.region
+  profile = "default"
   default_tags {
     tags = {
       Env       = var.env
