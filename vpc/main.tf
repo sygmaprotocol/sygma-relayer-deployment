@@ -11,6 +11,7 @@ terraform {
 // Configure the AWS Provider
 provider "aws" {
   region = var.region
+  profile = "default"
 }
 
 // Get All Availability Zones
@@ -29,6 +30,11 @@ data "aws_security_group" "default" {
   vpc_id = module.vpc.vpc_id
 }
 
+resource "aws_eip" "nat" {
+  count = 1
+  vpc   = true
+
+}
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "3.14.0"
@@ -53,8 +59,10 @@ module "vpc" {
   enable_dns_hostnames = true
   enable_dns_support   = true
 
-  enable_nat_gateway = true
-  single_nat_gateway = true
+  enable_nat_gateway  = true
+  single_nat_gateway  = true
+  reuse_nat_ips       = true
+  external_nat_ip_ids = aws_eip.nat.*.id
 
   manage_default_security_group = true
   manage_default_network_acl    = true
@@ -62,82 +70,82 @@ module "vpc" {
 
   tags = merge(
     tomap({
-      "Name"      = "${var.project_name}-${lower(var.env)}-vpc",
-      "Project"   = var.project_name,
-      "Env"       = var.env,
-      "Terraform" = "true"
+      "Name"        = "${var.project_name}-${lower(var.env)}-vpc",
+      "Project"     = var.project_name,
+      "Environment" = var.env,
+      "Terraform"   = "true"
     })
   )
 
   public_subnet_tags = merge(
     tomap({
-      "Name"      = "${var.project_name}-public-subnet",
-      "Project"   = var.project_name,
-      "Env"       = var.env,
-      "Terraform" = "true"
+      "Name"        = "${var.project_name}-public-subnet",
+      "Project"     = var.project_name,
+      "Environment" = var.env,
+      "Terraform"   = "true"
     })
   )
 
   private_subnet_tags = merge(
     tomap({
-      "Name"      = "${var.project_name}-private-subnet",
-      "Project"   = var.project_name,
-      "Env"       = var.env,
-      "Terraform" = "true"
+      "Name"        = "${var.project_name}-private-subnet",
+      "Project"     = var.project_name,
+      "Environment" = var.env,
+      "Terraform"   = "true"
     })
   )
 
   database_subnet_tags = merge(
     tomap({
-      "Name"      = "${var.project_name}-rds-subnet",
-      "Project"   = var.project_name,
-      "Env"       = var.env,
-      "Terraform" = "true"
+      "Name"        = "${var.project_name}-rds-subnet",
+      "Project"     = var.project_name,
+      "Environment" = var.env,
+      "Terraform"   = "true"
     })
   )
 
   elasticache_subnet_tags = merge(
     tomap({
-      "Name"      = "${var.project_name}-redis-subnet",
-      "Project"   = var.project_name,
-      "Env"       = var.env,
-      "Terraform" = "true"
+      "Name"        = "${var.project_name}-redis-subnet",
+      "Project"     = var.project_name,
+      "Environment" = var.env,
+      "Terraform"   = "true"
     })
   )
 
   igw_tags = merge(
     tomap({
-      "Name"      = "${var.project_name}-igw",
-      "Project"   = var.project_name,
-      "Env"       = var.env,
-      "Terraform" = "true"
+      "Name"        = "${var.project_name}-igw",
+      "Project"     = var.project_name,
+      "Environment" = var.env,
+      "Terraform"   = "true"
     })
   )
 
   nat_gateway_tags = merge(
     tomap({
-      "Name"      = "${var.project_name}-ngw",
-      "Project"   = var.project_name,
-      "Env"       = var.env,
-      "Terraform" = "true"
+      "Name"        = "${var.project_name}-ngw",
+      "Project"     = var.project_name,
+      "Environment" = var.env,
+      "Terraform"   = "true"
     })
   )
 
   nat_eip_tags = merge(
     tomap({
-      "Name"      = "${var.project_name}-eip",
-      "Project"   = var.project_name,
-      "Env"       = var.env,
-      "Terraform" = "true"
+      "Name"        = "${var.project_name}-eip",
+      "Project"     = var.project_name,
+      "Environment" = var.env,
+      "Terraform"   = "true"
     })
   )
 
   default_security_group_tags = merge(
     tomap({
-      "Name"      = "${var.project_name}-${lower(var.env)}-sg",
-      "Project"   = var.project_name,
-      "Env"       = var.env,
-      "Terraform" = "true"
+      "Name"        = "${var.project_name}-${lower(var.env)}-sg",
+      "Project"     = var.project_name,
+      "Environment" = var.env,
+      "Terraform"   = "true"
     })
   )
 }

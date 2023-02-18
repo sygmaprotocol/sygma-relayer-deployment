@@ -1,0 +1,57 @@
+name: Deploy TESTNET
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AWS_REGION: '${{ secrets.AWS_REGION }}'
+  ENVIRONMENT: 'TESTNET'
+  PROJECT_NAME: "relayer-choice"
+  TAG: "Demo"
+  AWS_TESTNET: '${{ secrets.AWS_ARN }}'
+
+jobs:
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        relayer_id: [0, 1, 2]
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: checkout the source code
+        uses: actions/checkout@v3
+
+      - name: render jinja2 templates to task definition json files
+        uses: cuchi/jinja2-action@v1.2.0
+        with:
+          template: 'ecs/task_definition-${{ env.ENVIRONMENT }}.j2'
+          output_file: 'ecs/task_definition-${{ matrix.relayer_id }}_${{ env.ENVIRONMENT }}.json'
+          data_format: json
+          variables: |
+            relayerId=${{ matrix.relayer_id }}
+            awsAccountId=${{ env.AWS_TESTNET }}
+            awsRegion=${{ env.AWS_REGION }}
+            relayerName=${{ env.PROJECT_NAME }}
+            appTag=${{ env.TAG }}
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::${{ env.AWS_TESTNET }}:role/github-actions-${{ env.ENVIRONMENT }}-chainbridge
+          aws-region: ${{ env.AWS_REGION }}
+          role-session-name: GithubActions
+
+      - name: deploy task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: 'ecs/task_definition-${{ matrix.relayer_id }}_${{ env.ENVIRONMENT }}.json'
+          service: 'relayer-${{ matrix.relayer_id }}-service-${{ env.ENVIRONMENT }}'
+          cluster: 'relayer-${{ env.ENVIRONMENT }}'
+          wait-for-service-stability: true
