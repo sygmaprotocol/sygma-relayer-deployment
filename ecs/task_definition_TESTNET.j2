@@ -6,7 +6,7 @@
           "logConfiguration": { 
              "logDriver": "awslogs",
              "options": { 
-                "awslogs-group": "/ecs/{{ relayerName }}-{{ relaerId }}-{{ appTag }}",
+                "awslogs-group": "/ecs/{{ relayerName }}-{{ relayerId }}-{{ appTag }}",
                 "awslogs-region": "{{ awsRegion }}",
                 "awslogs-stream-prefix": "ecs"
              }
