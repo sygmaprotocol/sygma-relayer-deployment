@@ -8,7 +8,7 @@ on:
 env:
   AWS_REGION: '${{ secrets.AWS_REGION }}'
   ENVIRONMENT: 'TESTNET'
-  PROJECT_NAME: "relayer-choice"
+  PROJECT_NAME: "relayers-choice"
   TAG: "Demo"
   AWS_TESTNET: '${{ secrets.AWS_ARN }}'
 
