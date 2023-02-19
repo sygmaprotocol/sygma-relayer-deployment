@@ -14,7 +14,7 @@
           "command": [
             "run --config /cfg/config_evm-evm_1.json --testkey alice --fresh"
           ],      
-          "name": "{{ relayerName }}-container-{{ appTag }}",
+          "name": "{{ relayerName }}-{{ relayerId }}-container-{{ appTag }}",
           "portMappings": [ 
              { 
                 "containerPort": 9000,
@@ -36,14 +36,14 @@
           "secrets": [ 
              { 
                 "name": "SECRET_EXAMPLE",
-                "valueFrom": "arn:aws:ssm:<REGION:<YOUR_AWS_ACCOUNT_ID>:parameter/chainbridge/example"
+                "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/chainbridge/example"
              }
           ]
        }
     ],
     "cpu": "256",
-    "executionRoleArn": "arn:aws:iam::<YOUR_AWS_ACCOUNT_ID>:role/relayer-ecsTaskExecutionRole",
-    "family": "{{ relayerName }}-container-{{ appTag }}",
+    "executionRoleArn": "arn:aws:iam:{{ awsRegion }}:{{ awsAccountId }}:role/relayer-ecsTaskExecutionRole",
+    "family": "{{ relayerName }}-{{ relayerId }}-container-{{ appTag }}",
     "memory": "512",
     "networkMode": "awsvpc",
     "runtimePlatform": {
