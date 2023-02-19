@@ -8,7 +8,7 @@ on:
 env:
   AWS_REGION: '${{ secrets.AWS_REGION }}'
   ENVIRONMENT: 'TESTNET'
-  PROJECT_NAME: "relayer-choice"
+  PROJECT_NAME: "relayers-choice"
   TAG: "Demo"
   AWS_TESTNET: '${{ secrets.AWS_ARN }}'
 
@@ -44,7 +44,7 @@ jobs:
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: arn:aws:iam:${{ env.AWS_REGION }}:${{ env.AWS_TESTNET }}:role/github-actions-SDLC
+          role-to-assume: arn:aws:iam::${{ env.AWS_TESTNET }}:role/github-actions-SDLC
           aws-region: ${{ env.AWS_REGION }}
           role-session-name: GithubActions
 

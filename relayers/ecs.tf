@@ -12,8 +12,8 @@ resource "aws_ecs_task_definition" "main" {
   requires_compatibilities = ["FARGATE"]
   cpu                      = var.app_cpu_usage
   memory                   = var.app_memory_usage
-  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
-  task_role_arn            = aws_iam_role.ecs_task_role.arn
+  execution_role_arn       = aws_iam_role.ecs_task_execution_role[count.index].arn
+  task_role_arn            = aws_iam_role.ecs_task_role[count.index].arn
 
   container_definitions = jsonencode([
     {
@@ -49,7 +49,7 @@ resource "aws_ecs_service" "main" {
   desired_count                      = 1
   deployment_minimum_healthy_percent = var.deployment_minimum_healthy_percent
   deployment_maximum_percent         = 200
-  task_definition                    = aws_ecs_task_definition.main.arn
+  task_definition                    = aws_ecs_task_definition.main[count.index].arn
   launch_type                        = "FARGATE"
   scheduling_strategy                = "REPLICA"
 
@@ -109,7 +109,7 @@ resource "aws_appautoscaling_target" "ecs_target" {
   count = var.relayers
   max_capacity       = var.app_max_capacity
   min_capacity       = 1
-  resource_id        = "service/arn:aws:ecs:us-east-2:852551629426:cluster/relayer-STAGE/${aws_ecs_service.main.name}"
+  resource_id        = "service/${aws_ecs_cluster.main.name}/${aws_ecs_service.main[count.index].name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
 }
@@ -118,9 +118,9 @@ resource "aws_appautoscaling_policy" "ecs_policy_memory" {
   count = var.relayers
   name               = "memory-autoscaling"
   policy_type        = "TargetTrackingScaling"
-  resource_id        = aws_appautoscaling_target.ecs_target.resource_id
-  scalable_dimension = aws_appautoscaling_target.ecs_target.scalable_dimension
-  service_namespace  = aws_appautoscaling_target.ecs_target.service_namespace
+  resource_id        = aws_appautoscaling_target.ecs_target[count.index].resource_id
+  scalable_dimension = aws_appautoscaling_target.ecs_target[count.index].scalable_dimension
+  service_namespace  = aws_appautoscaling_target.ecs_target[count.index].service_namespace
 
   target_tracking_scaling_policy_configuration {
     predefined_metric_specification {
@@ -134,9 +134,9 @@ resource "aws_appautoscaling_policy" "ecs_policy_cpu" {
   count = var.relayers
   name               = "cpu-autoscaling"
   policy_type        = "TargetTrackingScaling"
-  resource_id        = aws_appautoscaling_target.ecs_target.resource_id
-  scalable_dimension = aws_appautoscaling_target.ecs_target.scalable_dimension
-  service_namespace  = aws_appautoscaling_target.ecs_target.service_namespace
+  resource_id        = aws_appautoscaling_target.ecs_target[count.index].resource_id
+  scalable_dimension = aws_appautoscaling_target.ecs_target[count.index].scalable_dimension
+  service_namespace  = aws_appautoscaling_target.ecs_target[count.index].service_namespace
 
   target_tracking_scaling_policy_configuration {
     predefined_metric_specification {
