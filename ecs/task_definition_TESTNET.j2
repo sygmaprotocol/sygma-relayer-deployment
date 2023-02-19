@@ -42,7 +42,7 @@
        }
     ],
     "cpu": "256",
-    "executionRoleArn": "arn:aws:iam::{{ awsAccountId }}:role/relayer-ecsTaskExecutionRole",
+    "executionRoleArn": "arn:aws:iam::{{ awsAccountId }}:role/{{ relayerName }}-{{ relayerId }}-ecsTaskExecutionRole",
     "family": "{{ relayerName }}-{{ relayerId }}-container-{{ appTag }}",
     "memory": "512",
     "networkMode": "awsvpc",
