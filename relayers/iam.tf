@@ -1,5 +1,6 @@
 resource "aws_iam_role" "ecs_task_role" {
-  name = "${var.project_name}-ecsTaskRole"
+  count = var.relayers
+  name = "${var.project_name}-${count.index}-ecsTaskRole"
 
   assume_role_policy = <<EOF
 {
@@ -19,7 +20,8 @@ EOF
 }
 
 resource "aws_iam_policy" "task_policy" {
-  name        = "${var.project_name}-task-policy"
+  count = var.relayers
+  name        = "${var.project_name}-${count.index}-task-policy"
   path        = "/"
   description = "Task App policy"
 
@@ -41,8 +43,9 @@ resource "aws_iam_policy" "task_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "ecs-task-role-policy-attachment" {
-  role       = aws_iam_role.ecs_task_role.name
-  policy_arn = aws_iam_policy.task_policy.arn
+  count = var.relayers
+  role       = aws_iam_role.ecs_task_role[count.index].name
+  policy_arn = aws_iam_policy.task_policy[count.index].arn
 }
 
 ###
@@ -50,7 +53,8 @@ resource "aws_iam_role_policy_attachment" "ecs-task-role-policy-attachment" {
 ###
 
 resource "aws_iam_role" "ecs_task_execution_role" {
-  name = "${var.project_name}-ecsTaskExecutionRole"
+  count = var.relayers
+  name = "${var.project_name}-${count.index}-ecsTaskExecutionRole"
 
   assume_role_policy = <<EOF
 {
@@ -70,11 +74,13 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "ecs-task-execution-role-policy-attachment" {
-  role       = aws_iam_role.ecs_task_execution_role.name
+  count = var.relayers
+  role       = aws_iam_role.ecs_task_execution_role[count.index].name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
 resource "aws_iam_role_policy_attachment" "ecs-ssm-role-policy-attachment" {
-  role       = aws_iam_role.ecs_task_execution_role.name
-  policy_arn = aws_iam_policy.task_policy.arn
+  count = var.relayers
+  role       = aws_iam_role.ecs_task_execution_role[count.index].name
+  policy_arn = aws_iam_policy.task_policy[count.index].arn
 }
