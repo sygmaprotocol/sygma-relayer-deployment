@@ -11,9 +11,13 @@
                 "awslogs-stream-prefix": "ecs"
              }
           },
-          "command": [
-            "run --config /cfg/config_evm-evm_1.json --testkey alice --fresh"
-          ],      
+      "command": [
+        "run",
+        "--config=env",
+        "--config-url=https://cloudflare-ipfs.com/ipns/k51qzi5uqu5dl7lcxeouwu0cgyaa6kz48a7ai1dwfjin9vsah8purks2va58hp",
+        "--name=R{{ relayerId }}",
+        "--blockstore=/mount/relayer{{ relayerId }}/lvldbdata"
+      ],      
           "name": "{{ relayerName }}-{{ relayerId }}-container-{{ appTag }}",
           "portMappings": [ 
              { 
@@ -46,6 +50,16 @@
     "family": "{{ relayerName }}-{{ relayerId }}-container-{{ appTag }}",
     "memory": "512",
     "networkMode": "awsvpc",
+    "volumes": [
+    {
+      "name": "efs",
+      "efsVolumeConfiguration": {
+        "fileSystemId": "fs-06800d75dfdd4c546",
+        "rootDirectory": "/",
+        "transitEncryption": "ENABLED"
+      }
+    }
+   ],    
     "runtimePlatform": {
          "operatingSystemFamily": "LINUX"
      },
