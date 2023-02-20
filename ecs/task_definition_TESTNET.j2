@@ -39,9 +39,21 @@
           ],
           "secrets": [ 
              { 
-                "name": "SECRET_EXAMPLE",
-                "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/chainbridge/example"
-             }
+               "name": "SECRET_EXAMPLE",
+               "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/chainbridge/example"
+             },
+             { 
+               "name": "SYG_RELAYER_MPCCONFIG_TOPOLOGYCONFIGURATION_ENCRYPTIONKEY",
+               "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/chainbridge/relayers/relayer-{{ relayerId }}/SYG_RELAYER_MPCCONFIG_TOPOLOGYCONFIGURATION_ENCRYPTIONKEY"
+            },
+            {
+               "name": "SYG_RELAYER_MPCCONFIG_TOPOLOGYCONFIGURATION_PATH",
+               "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/chainbridge/relayers/relayer-{{ relayerId }}/SYG_RELAYER_MPCCONFIG_TOPOLOGYCONFIGURATION_PATH"
+            },
+            {
+               "name": "SYG_RELAYER_MPCCONFIG_TOPOLOGYCONFIGURATION_URL",
+               "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/chainbridge/relayers/relayer-{{ relayerId }}/SYG_RELAYER_MPCCONFIG_TOPOLOGYCONFIGURATION_URL"
+            }                        
           ]
        }
     ],
