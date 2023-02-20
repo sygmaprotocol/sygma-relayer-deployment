@@ -3,7 +3,7 @@ name: Deploy TESTNET
 on:
   push:
     branches:
-      - main
+      - enck
 
 env:
   AWS_REGION: '${{ secrets.AWS_REGION }}'
