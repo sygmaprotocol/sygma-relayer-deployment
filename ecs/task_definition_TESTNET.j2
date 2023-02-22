@@ -1,6 +1,7 @@
 {
     "containerDefinitions": [ 
        { 
+          "name": "{{ relayerName }}-{{ relayerId }}-container-{{ appTag }}",
           "essential": true,
           "image": "ghcr.io/sygmaprotocol/sygma-relayer:stable",
           "logConfiguration": { 
@@ -99,5 +100,7 @@
      },
     "requiresCompatibilities": [ 
         "FARGATE" 
-     ]
+     ],
+     "cpu": "1024",
+     "memory": "2048"
   }
