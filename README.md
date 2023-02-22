@@ -1,4 +1,4 @@
-# Sygma relyaer Deployment
+# Sygma relayer Deployment
 
 ## Setup AWS account
 
