@@ -36,7 +36,13 @@
               "name": "ENV_EXAMPLE",
               "value": "example"
            }
-          ],
+         "mountPoints": [
+            {
+               "sourceVolume": "efs",
+               "containerPath": "/mount"
+            }
+         ],
+         "volumesFrom": [],
           "secrets": [ 
              { 
                "name": "SYG_RELAYER_MPCCONFIG_KEY",
