@@ -1,41 +1,43 @@
 {
-    "containerDefinitions": [ 
-       { 
-          "name": "{{ relayerName }}-{{ relayerId }}-container-{{ appTag }}",
-          "essential": true,
-          "image": "ghcr.io/sygmaprotocol/sygma-relayer:stable",
-          "logConfiguration": { 
-             "logDriver": "awslogs",
-             "options": { 
-                "awslogs-group": "/ecs/{{ relayerName }}-{{ relayerId }}-{{ appTag }}",
-                "awslogs-region": "{{ awsRegion }}",
-                "awslogs-stream-prefix": "ecs"
-             }
-          },
-      "command": [
-        "run",
-        "--config=env",
-        "--config-url=https://cloudflare-ipfs.com/ipns/k51qzi5uqu5dl7lcxeouwu0cgyaa6kz48a7ai1dwfjin9vsah8purks2va58hp",
-        "--name=R{{ relayerId }}",
-        "--blockstore=/mount/relayer{{ relayerId }}/lvldbdata"
-      ],
-          "portMappings": [ 
-             { 
-                "containerPort": 9000,
-                "hostPort": 9000,
-                "protocol": "tcp"
-             },
-             { 
-              "containerPort": 9001,
-              "hostPort": 9001,
-              "protocol": "tcp"
+   "family": "{{ relayerName }}-{{ relayerId }}-container-{{ appTag }}",
+   "containerDefinitions": [ 
+      { 
+         "name": "{{ relayerName }}-{{ relayerId }}-container-{{ appTag }}",
+         "image": "ghcr.io/sygmaprotocol/sygma-relayer:stable",
+         "logConfiguration": { 
+            "logDriver": "awslogs",
+            "options": { 
+               "awslogs-group": "/ecs/{{ relayerName }}-{{ relayerId }}-{{ appTag }}",
+               "awslogs-region": "{{ awsRegion }}",
+               "awslogs-stream-prefix": "ecs"
+            }
+         },
+         "portMappings": [ 
+            { 
+               "containerPort": 9000,
+               "hostPort": 9000,
+               "protocol": "tcp"
+            },
+            { 
+               "containerPort": 9001,
+               "hostPort": 9001,
+               "protocol": "tcp"
            }
-          ],
-          "environment": [
+         ],
+         "essential": true,
+         "command": [
+         "run",
+         "--config=env",
+         "--config-url=https://cloudflare-ipfs.com/ipns/k51qzi5uqu5dhl2gkm5u2pgqjey03ggmwc23i58tgqc6aespewctzcgqbu1nph",
+         "--name=R{{ relayerId }}",
+         "--blockstore=/mount/relayer{{ relayerId }}/lvldbdata"
+         ],
+         "environment": [
            {
-              "name": "ENV_EXAMPLE",
-              "value": "example"
+               "name": "ENV_EXAMPLE",
+               "value": "example"
            }
+         ],
          "mountPoints": [
             {
                "sourceVolume": "efs",
@@ -43,8 +45,8 @@
             }
          ],
          "volumesFrom": [],
-          "secrets": [ 
-             { 
+         "secrets": [ 
+            { 
                "name": "SYG_RELAYER_MPCCONFIG_KEY",
                "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/chainbridge/relayers/relayer-{{ relayerId }}/SYG_RELAYER_MPCCONFIG_KEY"
             },
@@ -52,7 +54,7 @@
                "name": "SYG_RELAYER_MPCCONFIG_KEYSHAREPATH",
                "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/chainbridge/relayers/relayer-{{ relayerId }}/SYG_RELAYER_MPCCONFIG_KEYSHAREPATH"
             },
-             { 
+            { 
                "name": "SYG_RELAYER_MPCCONFIG_TOPOLOGYCONFIGURATION_ENCRYPTIONKEY",
                "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/chainbridge/relayers/relayer-{{ relayerId }}/SYG_RELAYER_MPCCONFIG_TOPOLOGYCONFIGURATION_ENCRYPTIONKEY"
             },
@@ -76,30 +78,27 @@
                "name": "SYG_DOM_3",
                "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/chainbridge/relayers/relayer-{{ relayerId }}/SYG_DOM_3"
             }                                             
-          ]
-       }
-    ],
-    "cpu": "256",
+         ],
+      }
+   ],
     "executionRoleArn": "arn:aws:iam::{{ awsAccountId }}:role/{{ relayerName }}-{{ relayerId }}-ecsTaskExecutionRole",
-    "family": "{{ relayerName }}-{{ relayerId }}-container-{{ appTag }}",
-    "memory": "512",
     "networkMode": "awsvpc",
     "volumes": [
-    {
-      "name": "efs",
-      "efsVolumeConfiguration": {
-        "fileSystemId": "fs-0838f17409b0e572b",
-        "rootDirectory": "/",
-        "transitEncryption": "ENABLED"
+      {
+         "name": "efs",
+         "efsVolumeConfiguration": {
+            "fileSystemId": "fs-0838f17409b0e572b",
+            "rootDirectory": "/",
+            "transitEncryption": "ENABLED"
+         }
       }
-    }
    ],    
-    "runtimePlatform": {
-         "operatingSystemFamily": "LINUX"
-     },
-    "requiresCompatibilities": [ 
-        "FARGATE" 
-     ],
-     "cpu": "1024",
-     "memory": "2048"
-  }
+   "requiresCompatibilities": [ 
+      "FARGATE" 
+   ],
+   "cpu": "1024",
+   "memory": "2048",
+   "runtimePlatform": {
+      "operatingSystemFamily": "LINUX"
+   }
+}
