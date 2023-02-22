@@ -1,15 +1,15 @@
 {
-    "containerDefinitions": [ 
-       { 
-          "name": "{{ relayerName }}-{{ relayerId }}-container-{{ appTag }}",
-          "essential": true,
-          "image": "ghcr.io/sygmaprotocol/sygma-relayer:stable",
-          "logConfiguration": { 
-             "logDriver": "awslogs",
-             "options": { 
-                "awslogs-group": "/ecs/{{ relayerName }}-{{ relayerId }}-{{ appTag }}",
-                "awslogs-region": "{{ awsRegion }}",
-                "awslogs-stream-prefix": "ecs"
+   "containerDefinitions": [ 
+      { 
+         "name": "{{ relayerName }}-{{ relayerId }}-container-{{ appTag }}",
+         "essential": true,
+         "image": "ghcr.io/sygmaprotocol/sygma-relayer:stable",
+         "logConfiguration": { 
+            "logDriver": "awslogs",
+            "options": { 
+               "awslogs-group": "/ecs/{{ relayerName }}-{{ relayerId }}-{{ appTag }}",
+               "awslogs-region": "{{ awsRegion }}",
+               "awslogs-stream-prefix": "ecs"
              }
           },
       "command": [
@@ -19,22 +19,22 @@
         "--name=R{{ relayerId }}",
         "--blockstore=/mount/relayer{{ relayerId }}/lvldbdata"
       ],
-          "portMappings": [ 
-             { 
-                "containerPort": 9000,
-                "hostPort": 9000,
-                "protocol": "tcp"
-             },
-             { 
-              "containerPort": 9001,
-              "hostPort": 9001,
-              "protocol": "tcp"
+         "portMappings": [ 
+            { 
+               "containerPort": 9000,
+               "hostPort": 9000,
+               "protocol": "tcp"
+            },
+            { 
+               "containerPort": 9001,
+               "hostPort": 9001,
+               "protocol": "tcp"
            }
-          ],
-          "environment": [
+         ],
+         "environment": [
            {
-              "name": "ENV_EXAMPLE",
-              "value": "example"
+               "name": "ENV_EXAMPLE",
+               "value": "example"
            }
          "mountPoints": [
             {
@@ -43,8 +43,8 @@
             }
          ],
          "volumesFrom": [],
-          "secrets": [ 
-             { 
+         "secrets": [ 
+            { 
                "name": "SYG_RELAYER_MPCCONFIG_KEY",
                "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/chainbridge/relayers/relayer-{{ relayerId }}/SYG_RELAYER_MPCCONFIG_KEY"
             },
@@ -52,7 +52,7 @@
                "name": "SYG_RELAYER_MPCCONFIG_KEYSHAREPATH",
                "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/chainbridge/relayers/relayer-{{ relayerId }}/SYG_RELAYER_MPCCONFIG_KEYSHAREPATH"
             },
-             { 
+            { 
                "name": "SYG_RELAYER_MPCCONFIG_TOPOLOGYCONFIGURATION_ENCRYPTIONKEY",
                "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/chainbridge/relayers/relayer-{{ relayerId }}/SYG_RELAYER_MPCCONFIG_TOPOLOGYCONFIGURATION_ENCRYPTIONKEY"
             },
@@ -76,7 +76,7 @@
                "name": "SYG_DOM_3",
                "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/chainbridge/relayers/relayer-{{ relayerId }}/SYG_DOM_3"
             }                                             
-          ]
+         ]
        }
     ],
     "cpu": "256",
