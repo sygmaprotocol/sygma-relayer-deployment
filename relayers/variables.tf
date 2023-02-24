@@ -7,7 +7,7 @@ variable "region" {
 
 variable "project_name" {
   type    = string
-  default = "relayers-choice"
+  default = "relayers" // set project name, same as the vpc
 }
 
 variable "env" {
@@ -26,12 +26,12 @@ variable "efs_port" {
 
 variable "app_image" {
   type    = string
-  default = "relayer-demo"
+  default = "demo"  // set your variable
 }
 
 variable "app_tag" {
   type    = string
-  default = "Demo"
+  default = "Demo" // set this tagging variable, 
 }
 
 ## Non-required variables
@@ -118,5 +118,5 @@ variable "deployment_minimum_healthy_percent" {
 
 variable "relayers" {
   type = number
-  default = 3
+  default = 3 //set number of relayers
 }
