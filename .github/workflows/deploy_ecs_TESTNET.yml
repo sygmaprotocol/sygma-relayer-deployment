@@ -11,6 +11,7 @@ env:
   PROJECT_NAME: "relayers-choice"
   TAG: "Demo"
   AWS_TESTNET: '${{ secrets.AWS_ARN }}'
+  AWS_ROLE: '${{secrets.AWS_ROLE_NAME}}'
 
 jobs:
   deploy:
@@ -44,7 +45,7 @@ jobs:
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: arn:aws:iam::${{ env.AWS_TESTNET }}:role/github-actions-SDLC
+          role-to-assume: arn:aws:iam::${{ env.AWS_TESTNET }}:role/${{AWS_ROLE}}
           aws-region: ${{ env.AWS_REGION }}
           role-session-name: GithubActions
 
