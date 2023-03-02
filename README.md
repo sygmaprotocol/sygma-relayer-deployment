@@ -16,11 +16,25 @@ Now we can proceed to the resources in our AWS Account.
 
 Before you run the Terraform Scripts, make sure to set the right Environment Variables to access your account. You might need an user with the right privileges to create the resources.
 
+
+### Executing the scripts
+In this guide we are describing process of deploying Relayers with github actions on the infrastructure on the AWS,
+as well as we provide all necesary scripts to provision the infra and deploy the relayers.
+
+
+
+#### Configure AWS
+
+```
+aws configure
+```
+More details on how to configurate AWS cli client you can find [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html)
+
 #### VPC
 
 The only requirement to create the Relayers infrastructure is a VPC. Of course you can use the default VPC from any region in your AWS account, but it's a best practice to create a VPC to allocate your resources. If you don't know what a VPC is, [use this document to better understand it](https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html).
 
-In this repository, we have the folder `terraform/vpc`. In that folder run the following commands:
+In this repository, we have the folder `vpc`. In that folder run the following commands:
 ```
 terraform init
 terraform apply
@@ -34,7 +48,7 @@ More details on how to run Terraform [what this video](https://learn.hashicorp.c
 
 #### ECS
 
-In this repository, we have the folder `terraform/relayers`. In that folder run the following commands:
+In this repository, we have the folder `relayers`. In that folder run the following commands:
 ```
 terraform init
 terraform apply
@@ -44,6 +58,13 @@ You might need to input a few variables, you can do that in the prompt that will
 
 When the prompt appears to apply the changes, type `yes`.
 
+#### Secret variables
+ AWS_REGION
+ AWS_ARN
+ AWS_TESTNET
+
+#### To change number of the relayers to deploy
+ Amount of IDS in array set amount of relayers to be deployed.
 
 ## How to run relayer configuration script
 
@@ -55,6 +76,7 @@ You can create any number of relayers. For each one, you're going to need a Task
 
 We use SSM to hold all of our secrets. To access it, go to your AWS Account, in the Search bar type `SSM`. Go into the Systems Manager Service. On the left side menu, go into Parameter Store.
 Now you can create any secrets that you want, and then reference it in the `secrets` section in the Task Definition.
+
 
 ## How to update relayer
 
