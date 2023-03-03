@@ -1,10 +1,10 @@
 # Sygma relayer Deployment guide
-This guide is a ste-by-stp manual that will help you deploy Sygma Relayer and join Sygma Bridge MPC consensus.
-*Note: This proces is not permissionles and should be agreed with Sygma team in advance. For more information please visit [website](https://buildwithsygma.com/)*
+This guide is a step-by-step manual that will help you deploy Sygma Relayer and join the Sygma Bridge MPC consensus.
+*Note: This process is not permissionless and should be agreed upon with the Sygma team in advance. For more information please visit [website](https://buildwithsygma.com/)*
 
-This deployment guide is based on assumptions that user will use AWS as an infrastructure provider and will use GitHub Actions as a deployment pipline. Althoug this guide is venodlocked for now, it is not meant to be like that so we are encoraging to use any providers of your choice.
+This deployment guide is based on assumptions that the user will use AWS as an infrastructure provider and will use GitHub Actions as a deployment pipeline. Although this guide is deadlocked for now, it is not meant to be like that so we are encouraging to use any providers of your choice.
 
-**While most of the code can be reused we still highly encoruage you to consider this guide to be more a demo then something to use directly on production without changes**
+**While most of the code can be reused we still highly encourage you to consider this guide to be more a demo than something to use directly on production without changes**
 
 ## Pre-requsitieves
 
@@ -14,16 +14,16 @@ This deployment guide is based on assumptions that user will use AWS as an infra
 **Note #2: Never use this private key for something else and keep it secret**
 ***Note #3: Do not forget to top up the balance of the sender key and set some periodic checks of the balance***
 
-The current TestNet/Mainent Relayer opearation requires to have private keys for 3 EVM networks: Goerli, Moonbase, and Polygon Mumbai (as it states for now).
+The current TestNet/Mainent Relayer operation requires private keys for 3 EVM networks: Goerli, Moonbase, and Polygon Mumbai (as it states for now).
 
 2. For each network, you should have an RPC provider. You can use your own node or any of the available SaaS providers like Alchemy or Infura.
 
-3. Fork the repo to your own organisation. In this guide GitHub repo used as CI/CD platform. More on GitHub actions read [here](https://docs.github.com/en/actions/learn-github-actions/understanding-github-actions)
+3. Fork the repo to your own organization. In this guide, the GitHub repo is used as CI/CD platform. More on GitHub actions read [here](https://docs.github.com/en/actions/learn-github-actions/understanding-github-actions)
 ### Setup AWS account
 
 If you already don't own an AWS Account, use [this link as a guide from the official support](https://aws.amazon.com/premiumsupport/knowledge-center/create-and-activate-aws-account/)
 
-## How to run infrastructure provisioning first time
+## How to run infrastructure provisioning the first time
 
 #### Tools
 
@@ -33,13 +33,13 @@ To create the resources in our repository you're going to need:
 
 Now we can proceed to the resources in our AWS Account.
 
-Before you run the Terraform Scripts, make sure to set the right Environment Variables to access your account. You might need an user with the right privileges to create the resources.
+Before you run the Terraform Scripts, make sure to set the right Environment Variables to access your account. You might need a user with the right privileges to create the resources.
 
 
 ### Executing the scripts
-This document provides setp-by step
-In this guide we are describing process of deploying Relayers with github actions on the infrastructure on the AWS,
-as well as we provide all necesary scripts to provision the infra and deploy the relayers.
+This document provides step-by-step
+In this guide, we are describing the process of deploying Relayers with GitHub actions on the infrastructure on the AWS,
+as well as we provide all necessary scripts to provision the infra and deploy the relayers.
 
 
 
@@ -48,11 +48,11 @@ as well as we provide all necesary scripts to provision the infra and deploy the
 ```
 aws configure
 ```
-More details on how to configurate AWS CLI client you can find [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html)
+More details on how to configure AWS CLI client you can find [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html)
 
 #### VPC
 
-The only requirement to create the Relayers infrastructure is a VPC. Of course you can use the default VPC from any region in your AWS account, but it's a best practice to create a VPC to allocate your resources. If you don't know what a VPC is, [use this document to better understand it](https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html).
+The only requirement to create the Relayers infrastructure is a VPC. Of course, you can use the default VPC from any region in your AWS account, but it's a best practice to create a VPC to allocate your resources. If you don't know what a VPC is, [use this document to better understand it](https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html).
 
 In this repository, we have the folder `vpc`. In that folder run the following commands:
 ```
@@ -92,15 +92,15 @@ The configuration for the relayers is in the folder `ecs`. For ECS we configure 
 
 
 #### Set Secret variables
-Set next secret variables in github Secret variables section. They will be used for deployment.
+Set the next secret variables in GitHub Secret variables section. They will be used for deployment.
 
- `AWS_REGION` - region where you want your relayer to be deployed
- `AWS_ARN` - ARN of the user that will be depoying the Relayer
- `AWS_ROLE` - name of IAM Role that will perform deployment
+ `AWS_REGION` - a region where you want your relayer to be deployed
+ `AWS_ARN` - ARN of the user that will be deploying the Relayer
+ `AWS_ROLE` - the name of IAM Role that will perform deployment
 
 #### Cofigurate other GitHub action variables.
 
-You can also configurate different [env vatiables](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/.github/workflows/deploy_ecs_TESTNET.yml#L8)
+You can also configure different [env vatiables](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/.github/workflows/deploy_ecs_TESTNET.yml#L8)
 
 ### Relayer configuration
 
@@ -118,7 +118,7 @@ During the infrastructure, provisioning terraforms scripts will create a number 
         "type": "evm", // types {evm, substrate}
         "key": "123", // Private key that used to send execution transactions
         "endpoint": {RPC endpoint},
-        "startBlock": 8415289, // the block from where you Relayer should start. (In mos times it should be lastest block)
+        "startBlock": 8415289, // the block from where your Relayer should start. (In most times it should be lastest block)
         "fresh": true,
     }
 
@@ -128,7 +128,7 @@ During the infrastructure, provisioning terraforms scripts will create a number 
         "type": "evm", // types {evm, substrate}
         "key": "123", // Private key that used to send execution transactions
         "endpoint": "{RPC endpoint}",
-        "startBlock": 8415289, // the block from where you Relayer should start. (In mos times it should be lastest block)
+        "startBlock": 8415289, // the block from where your Relayer should start. (In most times it should be lastest block)
         "fresh": true,
     }
 
@@ -148,7 +148,7 @@ During the infrastructure, provisioning terraforms scripts will create a number 
     *This key is used to secure libp2p communication between relayers. The format of the key is* RSA 2048 with base64 protobuf encoding.
 
     It is possible to generate a new key by using the CLI command `peer gen-key` from the [relayer repository](https://github.com/sygmaprotocol/sygma-relayer).
-    This will generate and output LibP2P peer identity and LibP2P private key, you will need both. But for this param use LibP2P private key.
+    This will generate an output LibP2P peer identity and LibP2P private key, you will need both. But for this param use LibP2P private key.
     **Note: keep private key secret**
 
     If you generate the key by yourself, you can find out complementary peer identity by running `peer info --private-key=<libp2p_identity_priv_key>`  This identity you will need later.
@@ -188,26 +188,27 @@ After all the information is provided Sygma team will regenerate Topology Map an
 
 
 ### Run the deployment
-After configuration is done, current pipline will run on every **push to main branch**.
+After configuration is done, the current pipeline will run on every **push to the main branch**.
 Make sure to grant all necessary permissions to the pipeline, either using IAM Roles or Environment Variables.
 
 
 ### Confirm
 Go to the logs.
 You should see something like
-`Processing 0 deposit events in blocks: 3422205 to 3422209` - this is the log that parsing the blocks in search of bridging event. That means that relayer up and listening.
+`Processing 0 deposit events in blocks: 3422205 to 3422209` - this is the log that parses the blocks in search of bridging events. That means that relayer up and listening.
 
 
 
 ## Other
 
-#### To change number of the relayers to deploy
+#### To change the number of relayers to deploy
 Amount of IDS in array set amount of relayers to be deployed.
 
-#### Relayer sahred configuration
-Relayer configuration is done with `--config-url` flag on Relayer start and can be chagned [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_TESTNET.j2#L23)
-This flag set-up shared configuration IPNS url that is used by all Relayers in MPC network and provided by Sygma.
-More on [shared configuration]() <-- TODO add link when shared config doc is ready
+#### Relayer shared configuration
+Relayer configuration is done with `--config-url` flag on Relayer start and can be changed [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_TESTNET.j2#L23)
+This flag set-up shared configuration IPNS URL that is used by all Relayers in the MPC network and provided by Sygma.
+More on [shared configuration]() <-- TODO add a link when shared config doc is ready
 
-#### Add new domain
+#### Add a new domain
 Add one more [DOM config](https://github.com/sygmaprotocol/devops/blob/main/relayers/ecs/task_definition-TESTNET.j2#L67)
+
