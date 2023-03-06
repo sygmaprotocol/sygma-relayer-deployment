@@ -173,7 +173,7 @@ Note:
     Example: `/mount/r1.keyshare` - path to the file that will contain MPC private key share. Should be unique per relayer. (eg /mount/r1.keyshare, /mount/r2.keyshare, /mount/r3.keyshare, etc)
 
 
-### Lunch relayer
+### Launching a relayer
 
 After all, the configuration parameters above are set we need to add your Relayer(s) to the Sygma MPC network by updating the network topology.
 
