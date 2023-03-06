@@ -175,7 +175,7 @@ Note:
 
 ### Launching a relayer
 
-After all, the configuration parameters above are set we need to add your Relayer(s) to the Sygma MPC network by updating the network topology.
+After all the configuration parameters above are set we need to add your Relayer(s) to the Sygma MPC network by updating the network topology.
 
 Provide the Sygma team with the next params so we update the topology map:
 
