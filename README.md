@@ -138,7 +138,7 @@ During the infrastructure, provisioning terraforms scripts will create a number 
         "type": "evm", // types {evm, substrate}
         "key": "123", // Private key that used to send execution transactions
         "endpoint": "{RPC endpoint}",
-        "startBlock": 8415289, // the block from where you Relayer should start. (In mos times it should be lastest block)
+        "startBlock": 8415289, // the block from where you Relayer should start. (Most times it should be lastest block)
         "fresh": true,
     }
     ```
