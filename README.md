@@ -100,7 +100,7 @@ Set the next secret variables in GitHub Secret variables section. They will be u
 
 #### Cofigurate other GitHub action variables.
 
-You can also configure different [env vatiables](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/.github/workflows/deploy_ecs_TESTNET.yml#L8)
+You can also configure different [env variables](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/.github/workflows/deploy_ecs_TESTNET.yml#L8)
 
 ### Relayer configuration
 
