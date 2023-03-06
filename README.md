@@ -195,7 +195,7 @@ Make sure to grant all necessary permissions to the pipeline, either using IAM R
 ### Confirm
 Go to the logs.
 You should see something like
-`Processing 0 deposit events in blocks: 3422205 to 3422209` - this is the log that parses the blocks in search of bridging events. That means that relayer up and listening.
+`Processing 0 deposit events in blocks: 3422205 to 3422209` - this is the log that parses the blocks in search of bridging events. That means that relayer is up and listening.
 
 
 
