@@ -206,7 +206,7 @@ Amount of IDS in array set amount of relayers to be deployed.
 
 #### Relayer shared configuration
 Relayer configuration is done with `--config-url` flag on Relayer start and can be changed [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_TESTNET.j2#L23)
-This flag set-up shared configuration IPNS URL that is used by all Relayers in the MPC network and provided by Sygma.
+This flag sets up shared configuration IPNS URL that is used by all Relayers in the MPC network and provided by Sygma.
 More on [shared configuration]() <-- TODO add a link when shared config doc is ready
 
 #### Add a new domain
