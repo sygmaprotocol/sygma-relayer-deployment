@@ -1,8 +1,8 @@
 resource "aws_s3_bucket" "config" {
-  bucket = format("%s-%s", var.project_name, lower(var.env))
+  bucket = format("astar-%s-%s", var.project_name, lower(var.env))
 
   tags = {
-    Name = format("%s-%s", var.project_name, lower(var.env))
+    Name = format("astar-%s-%s", var.project_name, lower(var.env))
   }
 }
 
