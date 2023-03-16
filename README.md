@@ -212,3 +212,7 @@ More on [shared configuration]() <-- TODO add a link when shared config doc is r
 #### Add a new domain
 Add one more [DOM config](https://github.com/sygmaprotocol/devops/blob/main/relayers/ecs/task_definition-TESTNET.j2#L67)
 
+#### Log Configuration
+Log configuration in `ecs` directory [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/ae7f2c11af64f517003d2b4c1de00167255cb031/ecs/task_definition_TESTNET.j2#L78)
+We use Datadog Log management and is configured [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/ae7f2c11af64f517003d2b4c1de00167255cb031/ecs/task_definition_TESTNET.j2#L105). 
+TODO --> Set your Datadog API Key [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/ae7f2c11af64f517003d2b4c1de00167255cb031/ecs/task_definition_TESTNET.j2#L160)
