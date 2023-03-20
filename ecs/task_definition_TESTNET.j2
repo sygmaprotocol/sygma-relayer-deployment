@@ -63,17 +63,9 @@
                "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/chainbridge/relayers/relayer/SYG_RELAYER_MPCCONFIG_TOPOLOGYCONFIGURATION_URL"
             },
             {
-               "name": "SYG_DOM_1",
-               "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/chainbridge/relayers/relayer-{{ relayerId }}/SYG_DOM_1"
-            },
-            {
-               "name": "SYG_DOM_2",
-               "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/chainbridge/relayers/relayer-{{ relayerId }}/SYG_DOM_2"
-            },
-            {
-               "name": "SYG_DOM_3",
-               "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/chainbridge/relayers/relayer-{{ relayerId }}/SYG_DOM_3"
-            }                                             
+              "name": "SYG_CHAINS",
+              "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/chainbridge/relayers/relayer-{{ relayerId }}/SYG_CHAINS"
+            }
          ],
          "logConfiguration": {
             "logDriver": "awsfirelens",
