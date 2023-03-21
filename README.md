@@ -109,7 +109,7 @@ Now you can create any secrets that you want, and then reference it in the `secr
 
 During the infrastructure, provisioning terraforms scripts will create a number of secret parameters in the [Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html). You should manually set this parameter according to the following description
 
-- **SYG_DOM_N -** domain configuration. One configuration per domain (network) (eg SYG_DOM_1, SYG_DOM_2, etc). Amount of supported domains is always growing, discuss this with the Sygma team but in general, scripts will create parameters for all Domains
+- **SYG_CHAINS-** domain configuration. One configuration for all domains (networks).
 
     ```solidity
     {
