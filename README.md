@@ -41,8 +41,6 @@ This document provides step-by-step
 In this guide, we are describing the process of deploying Relayers with GitHub actions on the infrastructure on the AWS,
 as well as we provide all necessary scripts to provision the infra and deploy the relayers.
 
-
-
 #### Configure AWS
 
 ```
@@ -112,35 +110,32 @@ During the infrastructure, provisioning terraforms scripts will create a number 
 - **SYG_CHAINS-** domain configuration. One configuration for all domains (networks).
 
     ```solidity
-    {
-        "id": 0,
-        "name": "goerli",
-        "type": "evm", // types {evm, substrate}
-        "key": "123", // Private key that used to send execution transactions
-        "endpoint": {RPC endpoint},
-        "startBlock": 8415289, // the block from where your Relayer should start. (In most times it should be lastest block)
-        "fresh": true,
-    }
-
-    {
-        "id": 0,
-        "name": "moonbase",
-        "type": "evm", // types {evm, substrate}
-        "key": "123", // Private key that used to send execution transactions
-        "endpoint": "{RPC endpoint}",
-        "startBlock": 8415289, // the block from where your Relayer should start. (Most times it should be lastest block)
-        "fresh": true,
-    }
-
-    {
-        "id": 0,
-        "name": "mumbai",
-        "type": "evm", // types {evm, substrate}
-        "key": "123", // Private key that used to send execution transactions
-        "endpoint": "{RPC endpoint}",
-        "startBlock": 8415289, // the block from where you Relayer should start. (Most times it should be lastest block)
-        "fresh": true,
-    }
+    [
+        {
+            "id": 0,
+            "name": "goerli",
+            "type": "evm", // types {evm, substrate}
+            "key": "123", // Private key that used to send execution transactions
+            "endpoint": {RPC endpoint},
+            "startBlock": 8415289, // the block from where your Relayer should start. (In most times it should be lastest block)
+        },
+        {
+            "id": 0,
+            "name": "moonbase",
+            "type": "evm", // types {evm, substrate}
+            "key": "123", // Private key that used to send execution transactions
+            "endpoint": "{RPC endpoint}",
+            "startBlock": 8415289, // the block from where your Relayer should start. (Most times it should be lastest block)
+        },
+        {
+            "id": 0,
+            "name": "mumbai",
+            "type": "evm", // types {evm, substrate}
+            "key": "123", // Private key that used to send execution transactions
+            "endpoint": "{RPC endpoint}",
+            "startBlock": 8415289, // the block from where you Relayer should start. (Most times it should be lastest block)
+        }
+    ]
     ```
 
 - **SYG_RELAYER_MPCCONFIG_KEY -** secret libp2p key
@@ -208,9 +203,6 @@ Amount of IDS in array set amount of relayers to be deployed.
 Relayer configuration is done with `--config-url` flag on Relayer start and can be changed [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_TESTNET.j2#L23)
 This flag sets up shared configuration IPNS URL that is used by all Relayers in the MPC network and provided by Sygma.
 More on [shared configuration]() <-- TODO add a link when shared config doc is ready
-
-#### Add a new domain
-Add one more [DOM config](https://github.com/sygmaprotocol/devops/blob/main/relayers/ecs/task_definition-TESTNET.j2#L67)
 
 #### Log Configuration
 Log configuration in `ecs` directory [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/ae7f2c11af64f517003d2b4c1de00167255cb031/ecs/task_definition_TESTNET.j2#L78).<br>
