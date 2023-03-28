@@ -1,13 +1,14 @@
-# Adding new token process
-This guide describes all necessary steps that's Relaying partners need to take when Sygma bridge is being extended with new token (ERC20, ERC721, Substrate Asset)
-**NOTE next we are going to write `resource` instead of `token` to keep correspondence with tech documentation.**
+# Process of adding new token
+This technical documentation outlines the required steps that Relay Partners must follow in order to extend the Sygma Bridge with additional tokens (ERC20, ERC721, Substrate Assets). 
+**Note: The term `resource` will be used in place of `token` to maintain consistency with the code.**
 
-When new resource is getting added there is only step thaat Relaying partners needs to perform, is to restart the relayer when asked, so it applied changes from **Shared configuration** ([doc](https://github.com/sygmaprotocol/sygma-shared-configuration)).
+Upon the addition of a new resource, Relay Partners are only required to execute one step: restarting the relayer when prompted to do so. This ensures the adoption of changes from the **Shared Configuration** ([documentation](https://github.com/sygmaprotocol/sygma-shared-configuration)).
 
-But anyway here are the some internal details about how resource is getting added:
+Nonetheless, it is essential to understand the internal process of adding a resource:
 
-1. Sygma admin should register new Resource on all the chains that should have this resource, by registering [ResourceID](https://github.com/sygmaprotocol/sygma-solidity/blob/master/contracts/Bridge.sol#L144) on [Bridge Handlers](https://github.com/sygmaprotocol/sygma-solidity/tree/master/contracts/handlers)
-2. If necessary Resource should be added on FeeOracle (source of rates, or new calcualtion algorithm is resource represents something different)
-3. After all the necessary ResourceID's have been registered Sygma team will update **Shared configuration** ([doc](https://github.com/sygmaprotocol/sygma-shared-configuration)).
-4. And now all the relayers should be restarted in order to apply new config
- 
+1. Sygma administrators must register the new Resource on all relevant chains by registering the [ResourceID](https://github.com/sygmaprotocol/sygma-solidity/blob/master/contracts/Bridge.sol#L144) on the corresponding [Bridge Handlers](https://github.com/sygmaprotocol/sygma-solidity/tree/master/contracts/handlers).
+2. If needed, the Resource must be integrated into the FeeOracle, which serves as a source of exchange rates or a new calculation algorithm if the resource represents a different asset type.
+3. Once all the necessary ResourceID registrations are completed, the Sygma team will update the **Shared Configuration** ([documentation](https://github.com/sygmaprotocol/sygma-shared-configuration)).
+4. Finally, all relayers must be restarted to apply the new configuration settings.
+
+
