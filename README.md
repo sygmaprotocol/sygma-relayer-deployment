@@ -16,7 +16,7 @@ This deployment guide is based on assumptions that the user will use AWS as an i
 
 The current TestNet/Mainent Relayer operation requires private keys for 3 EVM networks: Goerli, Moonbase, and Polygon Mumbai (as it states for now).
 
-2. For each network, you should have an RPC provider. You can use your own node or any of the available SaaS providers like Alchemy or Infura.
+2. For each network, you should have an RPC provider. Relaying partners must align with the Sygma team on the specific clients or RPC providers to use, so we can ensure appropriate provider redundancy in order to increase network robustness and reliability.
 
 3. Fork the repo to your own organization. In this guide, the GitHub repo is used as CI/CD platform. More on GitHub actions read [here](https://docs.github.com/en/actions/learn-github-actions/understanding-github-actions)
 ### Setup AWS account
