@@ -109,33 +109,39 @@ During the infrastructure, provisioning terraforms scripts will create a number 
 
 - **SYG_CHAINS-** domain configuration. One configuration for all domains (networks).
 
-    ```solidity
-    [
-        {
-            "id": 0,
-            "name": "goerli",
-            "type": "evm", // types {evm, substrate}
-            "key": "123", // Private key that used to send execution transactions
-            "endpoint": {RPC endpoint},
-            "startBlock": 8415289, // the block from where your Relayer should start. (In most times it should be lastest block)
-        },
-        {
-            "id": 0,
-            "name": "moonbase",
-            "type": "evm", // types {evm, substrate}
-            "key": "123", // Private key that used to send execution transactions
-            "endpoint": "{RPC endpoint}",
-            "startBlock": 8415289, // the block from where your Relayer should start. (Most times it should be lastest block)
-        },
-        {
-            "id": 0,
-            "name": "mumbai",
-            "type": "evm", // types {evm, substrate}
-            "key": "123", // Private key that used to send execution transactions
-            "endpoint": "{RPC endpoint}",
-            "startBlock": 8415289, // the block from where you Relayer should start. (Most times it should be lastest block)
-        }
-    ]
+    ```json
+  [
+    {
+      "id": 1,
+      "name": "goerli",
+      "type": "evm",
+      "key": {key},
+      "endpoint": {rpc},
+      "maxGasPrice": 1000000000000,
+      "gasMultiplier": 2
+    },
+    {
+      "id":2,
+      "name":"moonbase",
+      "type":"evm",
+      "key": {key},
+      "endpoint": {rpc},
+    },
+    {
+      "id": 3,
+      "name": "polygon-mumbai",
+      "type": "evm",
+      "key": {key},
+      "endpoint": {rpc},
+    },
+    {
+      "id": 4,
+      "name": "sepolia",
+      "type": "evm",
+      "key": {key},
+      "endpoint": {rpc},
+    }
+  ]
     ```
 
 - **SYG_RELAYER_MPCCONFIG_KEY -** secret libp2p key
@@ -154,7 +160,9 @@ During the infrastructure, provisioning terraforms scripts will create a number 
 
 - **SYG_RELAYER_MPCCONFIG_TOPOLOGYCONFIGURATION_ENCRYPTIONKEY**
 
-    AES secret key that is used to encrypt libp2p network topology. The Sygma team will provide you with this key.
+    AES secret key that is used to encrypt libp2p network topology.
+    In order to obrain this secret key you need to fetch it from Sygma AWS account using AWS secrest sharing [Read this](https://docs.aws.amazon.com/secretsmanager/latest/userguide/auth-and-access_examples_cross.html) and [This](https://repost.aws/knowledge-center/secrets-manager-share-between-accounts)
+    Generally you would need to share some of your roles ID and we will provide and access to it in our AWS account. For details proactivelly contact Sygma team.
 
 Note:
 
