@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "name": "goerli",
+    "type": "evm",
+    "key": "e2167352971808a77ffa47c3d3c85bbf9d740759bc876f45fc38c53298a8e995",
+    "endpoint": "https://goerli.infura.io/v3/c083cc37cf76473f9a988a0691c57446",
+    "maxGasPrice": 1000000000000,
+    "gasMultiplier": 2
+  },
+  {
+    "id":2,
+    "name":"moonbase",
+    "type":"evm",
+    "key": "e2167352971808a77ffa47c3d3c85bbf9d740759bc876f45fc38c53298a8e995",
+    "endpoint": "https://rpc.api.moonbase.moonbeam.network"
+  },
+  {
+    "id": 3,
+    "name": "polygon-mumbai",
+    "type": "evm",
+    "key": "e2167352971808a77ffa47c3d3c85bbf9d740759bc876f45fc38c53298a8e995",
+    "endpoint": "https://rpc-mumbai.matic.today"
+  },
+  {
+    "id": 4,
+    "name": "sepolia",
+    "type": "evm",
+    "key": "e2167352971808a77ffa47c3d3c85bbf9d740759bc876f45fc38c53298a8e995",
+    "endpoint": "https://sepolia.infura.io/v3/c083cc37cf76473f9a988a0691c57446"
+  }
+]
