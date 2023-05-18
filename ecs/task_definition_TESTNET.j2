@@ -68,12 +68,43 @@
               "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/SYG_CHAINS"
             }
          ],
+         "logConfiguration": {
+            "logDriver": "awsfirelens",
+            "options": {
+               "provider": "ecs",
+               "dd_service": "Demo-relayers-{{ relayerId }}",
+               "dd_tags": "env:relayer,project:chainbridge,relayerid:{{ relayerId }}",
+               "dd_message_key": "log",
+               "Host": "http-intake.logs.datadoghq.com",
+               "TLS": "on",
+               "dd_source": "{{ relayerName }}-{{ relayerId }}-container-{{ appTag }}", 
+               "Name": "datadog"
+            },
+            "secretOptions": [
+               {
+                  "name": "apikey",
+                  "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/common/datadog/key"
+               }
+            ]
+         },
          "dependsOn": [
             {
                "containerName": "log_router",
                "condition": "START"
             }
          ]
+      },
+      {
+      "name": "datadog-agent",
+      "image": "gcr.io/datadoghq/agent:latest",
+      "essential": true,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/{{ relayerName }}-{{ relayerId }}-{{ appTag }}",
+          "awslogs-region": "{{ awsRegion }}",
+          "awslogs-stream-prefix": "ecs"
+        }
       },
       "healthCheck": {
         "retries": 3,
@@ -115,6 +146,12 @@
         {
           "name": "ENV",
           "value": "TESTNET"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "DD_API_KEY",
+          "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/common/datadog/key"
         }
       ],
       "mountPoints": [],
