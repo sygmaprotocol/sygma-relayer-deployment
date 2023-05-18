@@ -68,25 +68,6 @@
               "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/SYG_CHAINS"
             }
          ],
-         "logConfiguration": {
-            "logDriver": "awsfirelens",
-            "options": {
-               "provider": "ecs",
-               "dd_service": "Demo-relayers-{{ relayerId }}",
-               "dd_tags": "env:relayer,project:chainbridge,relayerid:{{ relayerId }}",
-               "dd_message_key": "log",
-               "Host": "http-intake.logs.datadoghq.com",
-               "TLS": "on",
-               "dd_source": "{{ relayerName }}-{{ relayerId }}-container-{{ appTag }}", 
-               "Name": "datadog"
-            },
-            "secretOptions": [
-               {
-                  "name": "apikey",
-                  "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/common/datadog/key"
-               }
-            ]
-         },
          "dependsOn": [
             {
                "containerName": "log_router",
@@ -94,69 +75,6 @@
             }
          ]
       },
-      {
-      "name": "datadog-agent",
-      "image": "gcr.io/datadoghq/agent:latest",
-      "essential": true,
-      "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-          "awslogs-group": "/ecs/{{ relayerName }}-{{ relayerId }}-{{ appTag }}",
-          "awslogs-region": "{{ awsRegion }}",
-          "awslogs-stream-prefix": "ecs"
-        }
-      },
-      "healthCheck": {
-        "retries": 3,
-        "command": ["CMD-SHELL","agent health"],
-        "timeout": 5,
-        "interval": 30,
-        "startPeriod": 15
-      },
-      "portMappings": [
-        {
-          "hostPort": 8126,
-          "protocol": "tcp",
-          "containerPort": 8126
-        }
-      ],
-      "command": [],
-      "cpu": 0,
-      "environment": [
-        {
-          "name": "DD_APM_ENABLED",
-          "value": "true"
-        },
-        {
-          "name": "DD_APM_NON_LOCAL_TRAFFIC",
-          "value": "true"
-        },
-        {
-          "name": "DD_TAGS",
-          "value": "env:TESTNET,project:relayer-{{ relayerId }}"
-        },
-        {
-          "name": "DD_LOG_LEVEL",
-          "value": "INFO"
-        },
-        {
-          "name": "ECS_FARGATE",
-          "value": "true"
-        },
-        {
-          "name": "ENV",
-          "value": "TESTNET"
-        }
-      ],
-      "secrets": [
-        {
-          "name": "DD_API_KEY",
-          "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/common/datadog/key"
-        }
-      ],
-      "mountPoints": [],
-      "volumesFrom": []
-    },
     {
       "name": "log_router",
       "image": "amazon/aws-for-fluent-bit:latest",
