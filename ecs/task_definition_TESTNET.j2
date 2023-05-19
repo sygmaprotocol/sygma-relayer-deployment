@@ -85,14 +85,6 @@
             "enable-ecs-log-metadata": "true"
         }
       },
-      "logConfiguration": { 
-            "logDriver": "awslogs",
-            "options": { 
-               "awslogs-group": "/ecs/{{ relayerName }}-{{ relayerId }}-{{ appTag }}",
-               "awslogs-region": "{{ awsRegion }}",
-               "awslogs-stream-prefix": "ecs"
-            }
-         },
          "portMappings": [],
          "command": [],
          "cpu": 0,
