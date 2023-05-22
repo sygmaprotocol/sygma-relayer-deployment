@@ -211,7 +211,7 @@
          "logConfiguration": {
             "logDriver": "awslogs",
                "options": {
-                  "awslogs-group": "/ecs/relayer-{{ relayerId }}-TESTNET",
+                  "awslogs-group": "/ecs/{{ relayerName }}-{{ relayerId }}-{{ appTag }}",
                   "awslogs-create-group": "True",
                   "awslogs-region": "us-east-2",
                   "awslogs-stream-prefix": "ecs"
