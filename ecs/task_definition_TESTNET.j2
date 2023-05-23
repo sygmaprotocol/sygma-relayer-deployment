@@ -199,7 +199,7 @@
          "name": "otel-collector",
          "image": "ghcr.io/sygmaprotocol/sygma-opentelemetry-collector:latest",
          "repositoryCredentials": {
-            "credentialsParameter": "arn:aws:secretsmanager:{{ awsRegion }}:{{ awsAccountId }}:secret:datadogkey-bibpBd"
+            "credentialsParameter": "arn:aws:secretsmanager:{{ awsRegion }}:{{ awsAccountId }}:secret:sygma/opentelemetry-Z1wcYA"
          },
          "cpu": 0,
          "portMappings": [],
@@ -212,8 +212,7 @@
             "logDriver": "awslogs",
                "options": {
                   "awslogs-group": "/ecs/{{ relayerName }}-{{ relayerId }}-{{ appTag }}",
-                  "awslogs-create-group": "True",
-                  "awslogs-region": "us-east-2",
+                  "awslogs-region": "{{ awsRegion }}",
                   "awslogs-stream-prefix": "ecs"
                   }
          }
