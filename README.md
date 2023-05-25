@@ -216,3 +216,52 @@ More on [shared configuration]() <-- TODO add a link when shared config doc is r
 Log configuration in `ecs` directory [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/ae7f2c11af64f517003d2b4c1de00167255cb031/ecs/task_definition_TESTNET.j2#L78).<br>
 We use Datadog Log management and is configured [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/ae7f2c11af64f517003d2b4c1de00167255cb031/ecs/task_definition_TESTNET.j2#L105). <br>
 TODO --> Set your Datadog API Key [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/ae7f2c11af64f517003d2b4c1de00167255cb031/ecs/task_definition_TESTNET.j2#L160)
+
+
+### OTLP AGENT 
+We use OpenTelemetry Agent as a sidecar container for aggragting relayers metrics, for now. Read the followings to build the OpenTelemetry Agent
+
+**Two stages are required for the configuration**
+- Building OpenTemetry Agent
+- Configuring Task Defintion for ecs users
+
+#### Building OpenTemetry Agent
+See the otlp-agent dirctory [here]()
+The agent require three major files
+- Builder: `otlp-builder.yml`
+- Config File: `otlp-config.yml`
+- Dockerfile
+
+
+#### Build The Otlp Agent
+The otlp-agent directory contains a CI workflow in .github directory to automate the build process. [Here]() is GitHub CI that build the image
+
+#### The Integration of the OpenTelemetry Agent
+See the task Definition section for the integration [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/e83bcc4eaf243ed52ff2404d2bf1bda150c36179/ecs/task_definition_TESTNET.j2#L199)
+
+The Otlp Agent endpoint must be set on the Relayers as environment variable
+```
+               "name": "SYG_RELAYER_OPENTELEMETRYCOLLECTORURL",
+               "value": "http://localhost:4318"
+```
+See [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/31a2a02d678d3f6940b09ac4876efe158495e950/ecs/task_definition_TESTNET.j2#L38)
+
+For easy reference, the env variables should be Organisation name with the environment to differentiate Relayers on the network.
+example
+| SYG_RELAYER_ENV: sygma_TESTNET
+```
+               "name": "SYG_RELAYER_ID",
+               "value": "{{ relayerId }}"
+            
+            
+               "name": "SYG_RELAYER_ENV",
+               "value": "Orginisation_environment"         
+```
+change this [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/31a2a02d678d3f6940b09ac4876efe158495e950/ecs/task_definition_TESTNET.j2#LL47C1-L47C1) as described above.
+
+#### Private Repository Access
+Configure [this](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/31a2a02d678d3f6940b09ac4876efe158495e950/ecs/task_definition_TESTNET.j2#L201) as per your organisation. 
+You may chose to remove [this](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/31a2a02d678d3f6940b09ac4876efe158495e950/ecs/task_definition_TESTNET.j2#L201) for accessing private reposiroty. 
+
+
+The Sygma Team Highly Recomend to use private repository for the otlp agent
