@@ -1,0 +1,90 @@
+extensions:
+  health_check:
+  pprof:
+    endpoint: :1888
+  zpages:
+    endpoint: :55679
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+  hostmetrics:
+    collection_interval: 10s
+    scrapers:
+      paging:
+        metrics:
+          system.paging.utilization:
+            enabled: true
+      load:
+        cpu_average: true
+      cpu:
+        metrics:
+          system.cpu.utilization:
+            enabled: true
+      disk:
+      filesystem:
+        metrics:
+          system.filesystem.utilization:
+            enabled: true
+      memory:
+      network:
+        metrics:
+          system.network.connections:
+            enabled: true
+      process:
+
+processors:
+  attributes:
+    actions:
+      - key: ${env:DD_API_KEY}
+
+  batch:
+    timeout: 10s
+    send_batch_max_size: 1000
+    send_batch_size: 100
+  resourcedetection:
+    detectors: [ecs, ec2, system]
+  probabilistic_sampler:
+    sampling_percentage: 20
+  # add the "datadog" processor definition
+  datadog:
+
+exporters:
+  datadog:
+    retry_on_failure:
+      enabled: true
+    host_metadata: 
+      hostname_source: config_or_system
+    api:
+      key: ${env:DD_API_KEY}
+      site: 'datadoghq.com'
+    metrics:
+      sums:
+        cumulative_monotonic_mode: to_delta #raw_value
+      histograms:
+        mode: distributions
+      summaries:
+        mode: gauges
+
+  logging:
+    verbosity: detailed
+    sampling_initial: 5
+    sampling_thereafter: 200
+
+service:
+  extensions: [health_check, pprof, zpages]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch, datadog, probabilistic_sampler]
+      exporters: [datadog, logging]
+    metrics:
+      receivers: [otlp, hostmetrics]
+      processors:  [batch]
+      exporters: [datadog, logging, ]
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [logging, datadog]
