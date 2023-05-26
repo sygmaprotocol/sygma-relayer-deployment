@@ -2,6 +2,9 @@ name: Deploy TESTNET
 
 on:
   push:
+    paths:
+      - 'ecs/**'
+      - '.github/workflows/deploy_ecs_TESTNET.yml'
     branches:
       - main
 
