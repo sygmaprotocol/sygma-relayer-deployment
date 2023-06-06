@@ -247,17 +247,20 @@ The Otlp Agent endpoint must be set on the Relayers as environment variable
 See [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/31a2a02d678d3f6940b09ac4876efe158495e950/ecs/task_definition_TESTNET.j2#L38)
 
 For easy reference, the env variables should be Organisation name with the environment to differentiate Relayers on the network.
-example
-| SYG_RELAYER_ENV: sygma_TESTNET
+For `SYG_RELAYER_ENV` use TESTNET if it is a testnet instance and `MAINNET` if it is a production
+For `SYG_RELAYER_ID` we need to make sure that it is unique for all relayers. So make sure that you have consulted with Sygma team about proper relayerid.
 ```
                "name": "SYG_RELAYER_ID",
                "value": "{{ relayerId }}"
             
             
                "name": "SYG_RELAYER_ENV",
-               "value": "Orginisation_environment"         
+               "value": "TESTNET"
 ```
 change this [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/31a2a02d678d3f6940b09ac4876efe158495e950/ecs/task_definition_TESTNET.j2#LL47C1-L47C1) as described above.
+
+#### Sharing metrics with Sygma
+FOr sharing metrics you would need to use DataDog API key provided by Sygma team. Set this key to DD_API_KEY env variable.  In task definition we are using ssm secrt store for [this](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/31a2a02d678d3f6940b09ac4876efe158495e950/ecs/task_definition_TESTNET.j2#L165)
 
 #### Private Repository Access
 Configure [this](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/31a2a02d678d3f6940b09ac4876efe158495e950/ecs/task_definition_TESTNET.j2#L201) as per your organisation. 
