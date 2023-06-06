@@ -14,7 +14,7 @@ This deployment guide is based on assumptions that the user will use AWS as an i
 **Note #2: Never use this private key for something else and keep it secret**
 ***Note #3: Do not forget to top up the balance of the sender key and set some periodic checks of the balance***
 
-The current TestNet/Mainent Relayer operation requires private keys for 3 EVM networks: Goerli, Moonbase, and Polygon Mumbai (as it states for now).
+The current TestNet operation requires private keys for 3 EVM networks: Goerli, Moonbase, and Polygon Mumbai (**as it states for now PLEASE CONFIRM THIS WITH SYGMA TEAM BEFOREHAND**).
 
 2. For each network, you should have an RPC provider. Relaying partners must align with the Sygma team on the specific clients or RPC providers to use, so we can ensure appropriate provider redundancy in order to increase network robustness and reliability.
 
@@ -107,7 +107,7 @@ Now you can create any secrets that you want, and then reference it in the `secr
 
 During the infrastructure, provisioning terraforms scripts will create a number of secret parameters in the [Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html). You should manually set this parameter according to the following description
 
-- **SYG_CHAINS-** domain configuration. One configuration for all domains (networks).
+- **SYG_CHAINS-** domain configuration. One configuration for all domains (networks). **JUST AN EXAMPLE CONFIRM LIST OF NETWORKS WITH SYGMA TEAM**
 
     ```json
   [
@@ -176,7 +176,7 @@ Note:
     Example: `/mount/r1.keyshare` - path to the file that will contain MPC private key share. Should be unique per relayer. (eg /mount/r1.keyshare, /mount/r2.keyshare, /mount/r3.keyshare, etc)
 
 
-### Launching a relayer
+### Launching a relayer to existing MPC set
 
 After all the configuration parameters above are set we need to add your Relayer(s) to the Sygma MPC network by updating the network topology.
 
