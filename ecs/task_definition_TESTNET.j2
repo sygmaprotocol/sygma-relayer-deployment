@@ -33,7 +33,19 @@
            {
                "name": "SYG_RELAYER_LOGLEVEL",
                "value": "debug"
-           }
+           },
+            {
+               "name": "SYG_RELAYER_OPENTELEMETRYCOLLECTORURL",
+               "value": "http://localhost:4318"
+            },
+            {
+               "name": "SYG_RELAYER_ID",
+               "value": "{{ relayerId }}"
+            },
+            {
+               "name": "SYG_RELAYER_ENV",
+               "value": "DEMO_DEVNET"
+            }
          ],
          "mountPoints": [
             {
@@ -133,7 +145,7 @@
         },
         {
           "name": "DD_TAGS",
-          "value": "env:TESTNET,project:relayer-{{ relayerId }}"
+          "value": "env:DEMO_DEVNET,project:relayer-{{ relayerId }}"
         },
         {
           "name": "DD_LOG_LEVEL",
@@ -145,7 +157,7 @@
         },
         {
           "name": "ENV",
-          "value": "TESTNET"
+          "value": "DEMO_DEVNET"
         }
       ],
       "secrets": [
@@ -182,6 +194,28 @@
          "mountPoints": [],
          "user": "0",
          "volumesFrom": []
+      },
+      {
+         "name": "otel-collector",
+         "image": "ghcr.io/sygmaprotocol/sygma-opentelemetry-collector:latest",
+         "repositoryCredentials": {
+            "credentialsParameter": "arn:aws:secretsmanager:{{ awsRegion }}:{{ awsAccountId }}:secret:sygma/opentelemetry-Z1wcYA"
+         },
+         "cpu": 0,
+         "portMappings": [],
+         "essential": true,
+         "environment": [],
+         "mountPoints": [],
+         "volumesFrom": [],
+         "dockerLabels": {},
+         "logConfiguration": {
+            "logDriver": "awslogs",
+               "options": {
+                  "awslogs-group": "/ecs/{{ relayerName }}-{{ relayerId }}-{{ appTag }}",
+                  "awslogs-region": "{{ awsRegion }}",
+                  "awslogs-stream-prefix": "ecs"
+                  }
+         }
       }
    ],
     "executionRoleArn": "arn:aws:iam::{{ awsAccountId }}:role/{{ relayerName }}-{{ relayerId }}-ecsTaskExecutionRole",

@@ -118,5 +118,5 @@ variable "deployment_minimum_healthy_percent" {
 
 variable "relayers" {
   type = number
-  default = 3 //set number of relayers
+  default = 1 //set number of relayers
 }

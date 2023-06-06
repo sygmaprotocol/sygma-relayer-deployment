@@ -1,0 +1,59 @@
+dist:
+  name: otelcol-sygma
+  description: Sygma OpenTelemetry Collector binary
+  output_path: ./bin
+  version: 0.75.0
+  otelcol_version: 0.75.0
+exporters:
+  - import: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusexporter
+    gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusexporter v0.75.0
+  - import: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/datadogexporter
+    gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/datadogexporter v0.75.0
+  - import: go.opentelemetry.io/collector/exporter/loggingexporter
+    gomod: go.opentelemetry.io/collector/exporter/loggingexporter v0.75.0
+  - import: go.opentelemetry.io/collector/exporter/otlphttpexporter 
+    gomod: go.opentelemetry.io/collector/exporter/otlphttpexporter v0.75.0
+  - import: go.opentelemetry.io/collector/exporter/otlpexporter
+    gomod: go.opentelemetry.io/collector/exporter/otlpexporter v0.75.0
+
+receivers:
+  - import: go.opentelemetry.io/collector/receiver/otlpreceiver
+    gomod: go.opentelemetry.io/collector/receiver/otlpreceiver v0.75.0
+  - import: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/prometheusreceiver
+    gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/prometheusreceiver v0.75.0
+  - import: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/otlpjsonfilereceiver
+    gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/otlpjsonfilereceiver v0.75.0
+  - import: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/hostmetricsreceiver
+    gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/hostmetricsreceiver v0.75.0
+  - import: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/datadogreceiver
+    gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/datadogreceiver v0.75.0
+
+extensions:
+  - import: go.opentelemetry.io/collector/extension/ballastextension
+    gomod: go.opentelemetry.io/collector/extension/ballastextension v0.75.0
+  - import: go.opentelemetry.io/collector/extension/zpagesextension
+    gomod: go.opentelemetry.io/collector/extension/zpagesextension v0.75.0
+  - import: github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension
+    gomod:  github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension v0.75.0
+  - import: github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension
+    gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.75.0
+
+processors:
+  - import: github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourcedetectionprocessor
+    gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourcedetectionprocessor v0.75.0
+  - import: github.com/open-telemetry/opentelemetry-collector-contrib/processor/redactionprocessor
+    gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/redactionprocessor v0.75.0
+  - import: go.opentelemetry.io/collector/processor/memorylimiterprocessor
+    gomod: go.opentelemetry.io/collector/processor/memorylimiterprocessor v0.75.0
+  - import: go.opentelemetry.io/collector/processor/batchprocessor
+    gomod: go.opentelemetry.io/collector/processor/batchprocessor v0.75.0
+  - import: github.com/open-telemetry/opentelemetry-collector-contrib/processor/datadogprocessor
+    gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/datadogprocessor v0.75.0
+  - import: github.com/open-telemetry/opentelemetry-collector-contrib/processor/probabilisticsamplerprocessor
+    gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/probabilisticsamplerprocessor v0.75.0
+  - import: github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor
+    gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor v0.75.0 
+
+connectors:
+  - import: go.opentelemetry.io/collector/connector/forwardconnector
+    gomod: go.opentelemetry.io/collector/connector/forwardconnector v0.75.0
