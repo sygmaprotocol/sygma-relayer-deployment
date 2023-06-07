@@ -39,7 +39,7 @@ jobs:
           output_file: 'ecs/task_definition-${{ matrix.relayer_id }}_${{ env.ENVIRONMENT }}.json'
           data_format: json
           variables: |
-            relayerId=${{ matrix.relayer_id }}
+            relayerId=5
             awsAccountId=${{ env.AWS_TESTNET }}
             awsRegion=${{ env.AWS_REGION }}
             relayerName=${{ env.PROJECT_NAME }}
