@@ -234,7 +234,10 @@ The agent require three major files
 
 
 #### Build The Otlp Agent
-The otlp-agent directory contains a CI workflow in .github directory to automate the build process. [Here]() is GitHub CI that build the image
+The otlp-agent directory contains a CI workflow in .github directory to automate the build process. [Here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/otlp-agent/.github/workflows/opentelemetry.yaml) is GitHub CI that build the image.
+You can use it as an example or use our build system of choice.
+
+After you have built your image, you should change [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_TESTNET.j2#L200) for your image path
 
 #### The Integration of the OpenTelemetry Agent
 See the task Definition section for the integration [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/e83bcc4eaf243ed52ff2404d2bf1bda150c36179/ecs/task_definition_TESTNET.j2#L199)
@@ -247,8 +250,8 @@ The Otlp Agent endpoint must be set on the Relayers as environment variable
 See [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/31a2a02d678d3f6940b09ac4876efe158495e950/ecs/task_definition_TESTNET.j2#L38)
 
 For easy reference, the env variables should be Organisation name with the environment to differentiate Relayers on the network.
-For `SYG_RELAYER_ENV` use TESTNET if it is a testnet instance and `MAINNET` if it is a production
-For `SYG_RELAYER_ID` we need to make sure that it is unique for all relayers. So make sure that you have consulted with Sygma team about proper relayerid.
+For `SYG_RELAYER_ENV` use TESTNET if it is a testnet instance and `MAINNET` if it is a production. Change it [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_TESTNET.j2#L47)
+For `SYG_RELAYER_ID` we need to make sure that it is unique for all relayers. So make sure that you have consulted with Sygma team about proper relayerid. Change it [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_TESTNET.j2#L43)
 ```
                "name": "SYG_RELAYER_ID",
                "value": "{{ relayerId }}"
@@ -257,7 +260,6 @@ For `SYG_RELAYER_ID` we need to make sure that it is unique for all relayers. So
                "name": "SYG_RELAYER_ENV",
                "value": "TESTNET"
 ```
-change this [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/31a2a02d678d3f6940b09ac4876efe158495e950/ecs/task_definition_TESTNET.j2#LL47C1-L47C1) as described above.
 
 #### Sharing metrics with Sygma
 FOr sharing metrics you would need to use DataDog API key provided by Sygma team. Set this key to DD_API_KEY env variable.  In task definition we are using ssm secrt store for [this](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/31a2a02d678d3f6940b09ac4876efe158495e950/ecs/task_definition_TESTNET.j2#L165)
