@@ -3,7 +3,7 @@
    "containerDefinitions": [ 
       { 
          "name": "{{ relayerName }}-{{ relayerId }}-container-{{ appTag }}",
-         "image": "ghcr.io/sygmaprotocol/sygma-relayer:stable",
+         "image": "ghcr.io/sygmaprotocol/sygma-relayer:latest",
          "portMappings": [ 
             { 
                "containerPort": 9000,
@@ -44,7 +44,7 @@
             },
             {
                "name": "SYG_RELAYER_ENV",
-               "value": "STAGE"
+               "value": {{ env }}
             }
          ],
          "mountPoints": [
@@ -85,7 +85,7 @@
             "options": {
                "provider": "ecs",
                "dd_service": "Demo-relayers-{{ relayerId }}",
-               "dd_tags": "env:relayer,project:chainbridge,relayerid:{{ relayerId }}",
+               "dd_tags": "env:{{ env }},project:chainbridge,relayerid:{{ relayerId }}",
                "dd_message_key": "log",
                "Host": "http-intake.logs.datadoghq.com",
                "TLS": "on",
@@ -145,7 +145,7 @@
         },
         {
           "name": "DD_TAGS",
-          "value": "env:DEMO_DEVNET,project:relayer-{{ relayerId }}"
+          "value": "env:{{ env }},project:relayer-{{ relayerId }}"
         },
         {
           "name": "DD_LOG_LEVEL",
@@ -157,7 +157,7 @@
         },
         {
           "name": "ENV",
-          "value": "DEMO_DEVNET"
+          "value": {{ env }}
         }
       ],
       "secrets": [
