@@ -72,7 +72,7 @@
             "options": {
                "provider": "ecs",
                "dd_service": "Demo-relayers-{{ relayerId }}",
-               "dd_tags": "env:relayer,project:chainbridge,relayerid:{{ relayerId }}",
+               "dd_tags": "env:STAGE,project:chainbridge,relayerid:{{ relayerId }}",
                "dd_message_key": "log",
                "Host": "http-intake.logs.datadoghq.com",
                "TLS": "on",
@@ -132,7 +132,7 @@
         },
         {
           "name": "DD_TAGS",
-          "value": "env:TESTNET,project:relayer-{{ relayerId }}"
+          "value": "env:STAGE,project:relayer-{{ relayerId }}"
         },
         {
           "name": "DD_LOG_LEVEL",

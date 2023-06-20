@@ -1,0 +1,206 @@
+{
+   "family": "{{ relayerName }}-{{ relayerId }}-container-{{ appTag }}",
+   "containerDefinitions": [
+      {
+         "name": "{{ relayerName }}-{{ relayerId }}-container-{{ appTag }}",
+         "image": "ghcr.io/sygmaprotocol/sygma-relayer:latest",
+         "portMappings": [
+            {
+               "containerPort": 9000,
+               "hostPort": 9000,
+               "protocol": "tcp"
+            },
+            {
+               "containerPort": 9001,
+               "hostPort": 9001,
+               "protocol": "tcp"
+           }
+         ],
+         "essential": true,
+         "command": [
+         "run",
+         "--config=env",
+         "--config-url={{change_this}}",
+         "--name=R{{ relayerId }}",
+         "--blockstore=/mount/relayer{{ relayerId }}/lvldbdata"
+         ],
+         "environment": [
+           {
+               "name": "DD_SERVICE",
+               "value": "relayers"
+           },
+           {
+               "name": "SYG_RELAYER_LOGLEVEL",
+               "value": "debug"
+           }
+         ],
+         "mountPoints": [
+            {
+               "sourceVolume": "efs",
+               "containerPath": "/mount"
+            }
+         ],
+         "volumesFrom": [],
+         "secrets": [
+            {
+               "name": "SYG_RELAYER_MPCCONFIG_KEY",
+               "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/chainbridge/relayers/relayer-{{ relayerId }}/SYG_RELAYER_MPCCONFIG_KEY"
+            },
+            {
+               "name": "SYG_RELAYER_MPCCONFIG_KEYSHAREPATH",
+               "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/chainbridge/relayers/relayer-{{ relayerId }}/SYG_RELAYER_MPCCONFIG_KEYSHAREPATH"
+            },
+            {
+               "name": "SYG_RELAYER_MPCCONFIG_TOPOLOGYCONFIGURATION_ENCRYPTIONKEY",
+               "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/chainbridge/relayers/relayer/SYG_RELAYER_MPCCONFIG_TOPOLOGYCONFIGURATION_ENCRYPTIONKEY"
+            },
+            {
+               "name": "SYG_RELAYER_MPCCONFIG_TOPOLOGYCONFIGURATION_PATH",
+               "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/chainbridge/relayers/relayer-{{ relayerId }}/SYG_RELAYER_MPCCONFIG_TOPOLOGYCONFIGURATION_PATH"
+            },
+            {
+               "name": "SYG_RELAYER_MPCCONFIG_TOPOLOGYCONFIGURATION_URL",
+               "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/chainbridge/relayers/relayer/SYG_RELAYER_MPCCONFIG_TOPOLOGYCONFIGURATION_URL"
+            },
+            {
+              "name": "SYG_CHAINS",
+              "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/chainbridge/relayers/relayer-{{ relayerId }}/SYG_CHAINS"
+            }
+         ],
+         "logConfiguration": {
+            "logDriver": "awsfirelens",
+            "options": {
+               "provider": "ecs",
+               "dd_service": "Demo-relayers-{{ relayerId }}",
+               "dd_tags": "env:{{ env }},project:chainbridge,relayerid:{{ relayerId }}",
+               "dd_message_key": "log",
+               "Host": "http-intake.logs.datadoghq.com",
+               "TLS": "on",
+               "dd_source": "{{ relayerName }}-{{ relayerId }}-container-{{ appTag }}",
+               "Name": "datadog"
+            },
+            "secretOptions": [
+               {
+                  "name": "apikey",
+                  "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/common/datadog/key"
+               }
+            ]
+         },
+         "dependsOn": [
+            {
+               "containerName": "log_router",
+               "condition": "START"
+            }
+         ]
+      },
+      {
+      "name": "datadog-agent",
+      "image": "gcr.io/datadoghq/agent:latest",
+      "essential": true,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/{{ relayerName }}-{{ relayerId }}-{{ appTag }}",
+          "awslogs-region": "{{ awsRegion }}",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "healthCheck": {
+        "retries": 3,
+        "command": ["CMD-SHELL","agent health"],
+        "timeout": 5,
+        "interval": 30,
+        "startPeriod": 15
+      },
+      "portMappings": [
+        {
+          "hostPort": 8126,
+          "protocol": "tcp",
+          "containerPort": 8126
+        }
+      ],
+      "command": [],
+      "cpu": 0,
+      "environment": [
+        {
+          "name": "DD_APM_ENABLED",
+          "value": "true"
+        },
+        {
+          "name": "DD_APM_NON_LOCAL_TRAFFIC",
+          "value": "true"
+        },
+        {
+          "name": "DD_TAGS",
+          "value": "env:{{ env }},project:relayer-{{ relayerId }}"
+        },
+        {
+          "name": "DD_LOG_LEVEL",
+          "value": "INFO"
+        },
+        {
+          "name": "ECS_FARGATE",
+          "value": "true"
+        },
+        {
+          "name": "ENV",
+          "value": "TESTNET"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "DD_API_KEY",
+          "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/common/datadog/key"
+        }
+      ],
+      "mountPoints": [],
+      "volumesFrom": []
+    },
+    {
+      "name": "log_router",
+      "image": "amazon/aws-for-fluent-bit:latest",
+      "essential": true,
+      "firelensConfiguration": {
+        "type": "fluentbit",
+        "options": {
+            "enable-ecs-log-metadata": "true"
+        }
+      },
+      "logConfiguration": {
+            "logDriver": "awslogs",
+            "options": {
+               "awslogs-group": "/ecs/{{ relayerName }}-{{ relayerId }}-{{ appTag }}",
+               "awslogs-region": "{{ awsRegion }}",
+               "awslogs-stream-prefix": "ecs"
+            }
+         },
+         "portMappings": [],
+         "command": [],
+         "cpu": 0,
+         "environment": [],
+         "mountPoints": [],
+         "user": "0",
+         "volumesFrom": []
+      }
+   ],
+    "executionRoleArn": "arn:aws:iam::{{ awsAccountId }}:role/{{ relayerName }}-{{ relayerId }}-ecsTaskExecutionRole",
+    "networkMode": "awsvpc",
+    "volumes": [
+      {
+         "name": "efs",
+         "efsVolumeConfiguration": {
+            "fileSystemId": "fs-0d2124b8842c39434",
+            "rootDirectory": "/",
+            "transitEncryption": "ENABLED"
+         }
+      }
+   ],
+   "requiresCompatibilities": [
+      "FARGATE"
+   ],
+   "cpu": "1024",
+   "memory": "2048",
+   "runtimePlatform": {
+      "operatingSystemFamily": "LINUX"
+   }
+}
