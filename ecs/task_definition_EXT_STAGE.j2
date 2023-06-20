@@ -3,7 +3,7 @@
    "containerDefinitions": [ 
       { 
          "name": "{{ relayerName }}-{{ relayerId }}-container-{{ appTag }}",
-         "image": "ghcr.io/sygmaprotocol/sygma-relayer:stable",
+         "image": "ghcr.io/sygmaprotocol/sygma-relayer:latest",
          "portMappings": [ 
             { 
                "containerPort": 9000,
@@ -20,10 +20,9 @@
          "command": [
          "run",
          "--config=env",
-         "--config-url=https://chainbridge-assets-stage.s3.us-east-2.amazonaws.com/shared-config-dev.json",
+         "--config-url=https://config.develop.buildwithsygma.com/share/",
          "--name=R{{ relayerId }}",
-         "--blockstore=/mount/relayer{{ relayerId }}/lvldbdata",
-         "--latest=true"
+         "--blockstore=/mount/relayer{{ relayerId }}/lvldbdata"
          ],
          "environment": [
            {
@@ -33,19 +32,7 @@
            {
                "name": "SYG_RELAYER_LOGLEVEL",
                "value": "debug"
-           },
-            {
-               "name": "SYG_RELAYER_OPENTELEMETRYCOLLECTORURL",
-               "value": "http://localhost:4318"
-            },
-            {
-               "name": "SYG_RELAYER_ID",
-               "value": "5"
-            },
-            {
-               "name": "SYG_RELAYER_ENV",
-               "value": "STAGE"
-            }
+           }
          ],
          "mountPoints": [
             {
@@ -85,7 +72,7 @@
             "options": {
                "provider": "ecs",
                "dd_service": "Demo-relayers-{{ relayerId }}",
-               "dd_tags": "env:relayer,project:chainbridge,relayerid:{{ relayerId }}",
+               "dd_tags": "env:STAGE,project:chainbridge,relayerid:{{ relayerId }}",
                "dd_message_key": "log",
                "Host": "http-intake.logs.datadoghq.com",
                "TLS": "on",
@@ -145,7 +132,7 @@
         },
         {
           "name": "DD_TAGS",
-          "value": "env:DEMO_DEVNET,project:relayer-{{ relayerId }}"
+          "value": "env:STAGE,project:relayer-{{ relayerId }}"
         },
         {
           "name": "DD_LOG_LEVEL",
@@ -157,7 +144,7 @@
         },
         {
           "name": "ENV",
-          "value": "DEMO_DEVNET"
+          "value": "TESTNET"
         }
       ],
       "secrets": [
@@ -194,28 +181,6 @@
          "mountPoints": [],
          "user": "0",
          "volumesFrom": []
-      },
-      {
-         "name": "otel-collector",
-         "image": "ghcr.io/sygmaprotocol/sygma-opentelemetry-collector:latest",
-         "repositoryCredentials": {
-            "credentialsParameter": "arn:aws:secretsmanager:{{ awsRegion }}:{{ awsAccountId }}:secret:sygma/opentelemetry-Z1wcYA"
-         },
-         "cpu": 0,
-         "portMappings": [],
-         "essential": true,
-         "environment": [],
-         "mountPoints": [],
-         "volumesFrom": [],
-         "dockerLabels": {},
-         "logConfiguration": {
-            "logDriver": "awslogs",
-               "options": {
-                  "awslogs-group": "/ecs/{{ relayerName }}-{{ relayerId }}-{{ appTag }}",
-                  "awslogs-region": "{{ awsRegion }}",
-                  "awslogs-stream-prefix": "ecs"
-                  }
-         }
       }
    ],
     "executionRoleArn": "arn:aws:iam::{{ awsAccountId }}:role/{{ relayerName }}-{{ relayerId }}-ecsTaskExecutionRole",

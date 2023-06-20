@@ -2,15 +2,12 @@ name: Deploy TESTNET
 
 on:
   push:
-    paths:
-      - 'ecs/**'
-      - '.github/workflows/deploy_ecs_TESTNET.yml'
     branches:
       - main
 
 env:
   AWS_REGION: '${{ secrets.AWS_REGION }}'
-  ENVIRONMENT: 'TESTNET'
+  ENVIRONMENT: 'EXT_STAGE'
   PROJECT_NAME: "relayers"
   TAG: "Demo"
   AWS_TESTNET: '${{ secrets.AWS_ARN }}'
@@ -44,6 +41,7 @@ jobs:
             awsRegion=${{ env.AWS_REGION }}
             relayerName=${{ env.PROJECT_NAME }}
             appTag=${{ env.TAG }}
+            env=STAGE
 
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v1
