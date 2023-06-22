@@ -84,7 +84,7 @@
             "logDriver": "awsfirelens",
             "options": {
                "provider": "ecs",
-               "dd_service": "Demo-relayers-{{ relayerId }}",
+               "dd_service": "{{ env }}-relayers-{{ relayerId }}",
                "dd_tags": "env:{{ env }},project:chainbridge,relayerid:{{ relayerId }}",
                "dd_message_key": "log",
                "Host": "http-intake.logs.datadoghq.com",
@@ -157,7 +157,7 @@
         },
         {
           "name": "ENV",
-          "value": "DEMO_DEVNET"
+          "value": "{{ env }}"
         }
       ],
       "secrets": [
