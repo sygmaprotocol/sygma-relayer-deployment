@@ -15,7 +15,6 @@ env:
   TAG: "Demo"
   AWS_TESTNET: '${{ secrets.AWS_ARN }}'
   AWS_ROLE: '${{ secrets.AWS_ROLE_NAME }}'
-  RELAYER_ID: 5
 
 jobs:
   deploy:
@@ -23,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        relayer_id: [0]
+        relayer_id: [5]
 
     permissions:
       contents: read
@@ -37,10 +36,10 @@ jobs:
         uses: cuchi/jinja2-action@v1.2.0
         with:
           template: 'ecs/task_definition_${{ env.ENVIRONMENT }}.j2'
-          output_file: 'ecs/task_definition-${{ env.RELAYER_ID }}_${{ env.ENVIRONMENT }}.json'
+          output_file: 'ecs/task_definition-${{ matrix.relayer_id }}_${{ env.ENVIRONMENT }}.json'
           data_format: json
           variables: |
-            relayerId=${{ env.RELAYER_ID }}
+            relayerId=${{ matrix.relayer_id }}
             awsAccountId=${{ env.AWS_TESTNET }}
             awsRegion=${{ env.AWS_REGION }}
             relayerName=${{ env.PROJECT_NAME }}
@@ -57,7 +56,7 @@ jobs:
       - name: deploy task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: 'ecs/task_definition-${{ env.RELAYER_ID }}_${{ env.ENVIRONMENT }}.json'
-          service: '${{ env.PROJECT_NAME }}-${{ env.RELAYER_ID }}-service-${{ env.TAG }}'
+          task-definition: 'ecs/task_definition-${{ matrix.relayer_id }}_${{ env.ENVIRONMENT }}.json'
+          service: '${{ env.PROJECT_NAME }}-${{ matrix.relayer_id }}-service-${{ env.TAG }}'
           cluster: 'relayer-${{ env.TAG }}'
           wait-for-service-stability: true
