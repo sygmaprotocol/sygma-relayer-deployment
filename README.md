@@ -76,6 +76,8 @@ You might need to input a few variables, you can do that in the prompt that will
 
 When the prompt appears to apply the changes, type `yes`.
 
+The `outputs.tf` script outputs the private DNS addresses in a file (dns_address) in `dns` directory.
+| This dns directory is not tracked by git to avoid accidentatl exposure.
 #### Configuration script
 
 The configuration for the relayers is in the folder `ecs`. For ECS we configure our applications with a Task Definition. [You can read more about it here](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definitions.html).
