@@ -4,7 +4,7 @@ This guide is a step-by-step manual that will help you deploy Sygma Relayer and 
 
 This deployment guide is based on assumptions that the user will use AWS as an infrastructure provider and will use GitHub Actions as a deployment pipeline. Although this guide is deadlocked for now, it is not meant to be like that so we are encouraging to use any providers of your choice.
 
-**While most of the code can be reused we still highly encourage you to consider this guide to be more a demo than something to use directly on production without changes**
+_### While most of the code can be reused we still highly encourage you to consider this repo to be a guide and a demo. It is expected that you will need to change some of TF or Task Definition variables according to your needs._
 
 ## Pre-requsitieves
 
@@ -14,11 +14,12 @@ This deployment guide is based on assumptions that the user will use AWS as an i
 **Note #2: Never use this private key for something else and keep it secret**
 ***Note #3: Do not forget to top up the balance of the sender key and set some periodic checks of the balance***
 
-The current TestNet operation requires private keys for 3 EVM networks: Goerli, Moonbase, and Polygon Mumbai (**as it states for now PLEASE CONFIRM THIS WITH SYGMA TEAM BEFOREHAND**).
+The current TestNet operates over various networks both EVM and Substrate. Hence you would need at least one EVM and Substrate private key (same key can be reused in different networks for 1 Relayer)  (**as it states for now PLEASE CONFIRM THIS WITH SYGMA TEAM BEFOREHAND**).
 
-2. For each network, you should have an RPC provider. Relaying partners must align with the Sygma team on the specific clients or RPC providers to use, so we can ensure appropriate provider redundancy in order to increase network robustness and reliability.
+2. For each network, you should have an RPC provider. Relaying partners must align with the Sygma team on the specific clients or RPC providers to use, so we can ensure appropriate provider redundancy in order to increase network robustness and reliability. We strongly reccomend you use own FullNodes.
 
-3. Fork the repo to your own organization. In this guide, the GitHub repo is used as CI/CD platform. More on GitHub actions read [here](https://docs.github.com/en/actions/learn-github-actions/understanding-github-actions)
+3. Fork the repo to your own organization, if you want to use GitHub actions as your CI/CD. In this guide, the GitHub repo is used as CI/CD platform. More on GitHub actions read [here](https://docs.github.com/en/actions/learn-github-actions/understanding-github-actions), otherwise just consider this as example.
+
 ### Setup AWS account
 
 If you already don't own an AWS Account, use [this link as a guide from the official support](https://aws.amazon.com/premiumsupport/knowledge-center/create-and-activate-aws-account/)
@@ -34,7 +35,6 @@ To create the resources in our repository you're going to need:
 Now we can proceed to the resources in our AWS Account.
 
 Before you run the Terraform Scripts, make sure to set the right Environment Variables to access your account. You might need a user with the right privileges to create the resources.
-
 
 ### Executing the scripts
 This document provides step-by-step
@@ -84,7 +84,7 @@ The configuration for the relayers is in the folder `ecs`. For ECS we configure 
 
 **Change EFS configuration according to your provision results.**
 
-[efsVolumeConfiguration](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_TESTNET.j2#L199) - set this value to the EFS File system ID that was created (should have `relayers-efs-Demo` name by default)
+[efsVolumeConfiguration](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_STAGE_EXT.j2#227) - set this value to the EFS File system ID that was created (should have `relayers-efs-Demo` name by default)
 
 
 
@@ -100,16 +100,17 @@ Set the next secret variables in GitHub Secret variables section. They will be u
 
 #### Cofigurate other GitHub action variables.
 
-You can also configure different [env variables](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/.github/workflows/deploy_ecs_TESTNET.yml#L8)
+You can also configure different [env variables](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/.github/workflows/deploy_ecs_STAGE_EXT.yml#L11)
 
 ### Relayer configuration
 
 We use SSM to hold all of our secrets. To access it, go to your AWS Account, in the Search bar type `SSM`. Go into the Systems Manager Service. On the left side menu, go into Parameter Store.
 Now you can create any secrets that you want, and then reference it in the `secrets` section in the Task Definition.
 
-During the infrastructure, provisioning terraforms scripts will create a number of secret parameters in the [Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html). You should manually set this parameter according to the following description
+During the infrastructure, provisioning terraforms scripts will create a number of secret parameters in the [Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html).
+You should **manually** set this parameter according to the following description
 
-- **SYG_CHAINS-** domain configuration. One configuration for all domains (networks). **JUST AN EXAMPLE CONFIRM LIST OF NETWORKS WITH SYGMA TEAM**
+- **SYG_CHAINS-** domain configuration. One configuration for all domains (networks). **JUST AN EXAMPLE CONFIRM LIST OF NETWORKS WITH SYGMA TEAM DEPENDS on EVN**
 
     ```json
   [
@@ -117,31 +118,25 @@ During the infrastructure, provisioning terraforms scripts will create a number 
       "id": 1,
       "name": "goerli",
       "type": "evm",
-      "key": {key},
-      "endpoint": {rpc},
+      "key": "",
+      "endpoint": "",
       "maxGasPrice": 1000000000000,
-      "gasMultiplier": 2
+      "gasMultiplier": 1.5
     },
     {
       "id":2,
-      "name":"moonbase",
+      "name":"sepolia",
       "type":"evm",
-      "key": {key},
-      "endpoint": {rpc},
+      "key":"",
+      "endpoint":"",
+      "fresh": true
     },
     {
       "id": 3,
-      "name": "polygon-mumbai",
-      "type": "evm",
-      "key": {key},
-      "endpoint": {rpc},
-    },
-    {
-      "id": 4,
-      "name": "sepolia",
-      "type": "evm",
-      "key": {key},
-      "endpoint": {rpc},
+      "name": "rhala",
+      "type": "substrate",
+      "key": "",
+      "endpoint": ""
     }
   ]
     ```
@@ -154,11 +149,18 @@ During the infrastructure, provisioning terraforms scripts will create a number 
     This will generate an output LibP2P peer identity and LibP2P private key, you will need both. But for this param use LibP2P private key.
     **Note: keep private key secret**
 
+    To use CLI:
+    - Clone sygma-relayer
+    - run `go mod tidy`
+    - run `make build-all`
+    - go to sygma-relayer/build/{your-platform}
+    - run `./relayer peer gen-key`
+
     If you generate the key by yourself, you can find out complementary peer identity by running `peer info --private-key=<libp2p_identity_priv_key>`  This identity you will need later.
 
 - **SYG_RELAYER_MPCCONFIG_TOPOLOGYCONFIGURATION_PATH**
 
-    Example: `/mount/r1-top.json` Should be unique per relayer. (eg /mount/r1-top.json, /mount/r2-top.json, etc)
+    Example: `/mount/r1-top.json` Should be unique per relayer. (eg /mount/r1-top.json, /mount/r2-top.json, etc). Should be persistent filesystem.
 
 - **SYG_RELAYER_MPCCONFIG_TOPOLOGYCONFIGURATION_ENCRYPTIONKEY**
 
@@ -175,12 +177,30 @@ Note:
 
 - **SYG_RELAYER_MPCCONFIG_KEYSHAREPATH**
 
-    Example: `/mount/r1.keyshare` - path to the file that will contain MPC private key share. Should be unique per relayer. (eg /mount/r1.keyshare, /mount/r2.keyshare, /mount/r3.keyshare, etc)
+    Example: `/mount/r1.keyshare` - path to the file that will contain MPC private key share. Should be unique per relayer. (eg /mount/r1.keyshare, /mount/r2.keyshare, /mount/r3.keyshare, etc). Should be persistent filesystem.
 
+
+
+### Log Configuration
+Log configuration in `ecs` directory [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_STAGE_EXT.j2#L83).<br>
+We use Datadog Log management and is configured [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_STAGE_EXT.j2#L110). <br>
+Set your Datadog API Key [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_STAGE_EXT.j2#L98)
+
+
+### Run the deployment
+After configuration is done, the current pipeline will run on every **push to the main branch**.
+Make sure to grant all necessary permissions to the pipeline, either using IAM Roles or Environment Variables.
+
+### Confirm
+Go to the logs.
+In current setup logs by default are recording by CloudWatch
+You should see something like
+`Processing 0 deposit events in blocks: 3422205 to 3422209` - this is the log that parses the blocks in search of bridging events. That means that relayer is up and listening.
+Also `"message":"Relayer not part of MPC. Waiting for refresh event..."` that means that your relayer is not prt of MPC group! Hence mve to the next section to proceed!
 
 ### Launching a relayer to existing MPC set
 
-After all the configuration parameters above are set we need to add your Relayer(s) to the Sygma MPC network by updating the network topology.
+After all the configuration parameters above are set and your Relayer is running your Relayer(s) need to be added to the Sygma MPC network by updating the network topology.
 
 Provide the Sygma team with the next params so we update the topology map:
 
@@ -192,68 +212,51 @@ The final address of your relayer in the topology map will look this `"/dns4/rel
 After all the information is provided Sygma team will regenerate Topology Map and initiate key Resharing by calling the Bridge contract [method](https://github.com/sygmaprotocol/sygma-solidity/blob/master/contracts/Bridge.sol#L351) with a new topology map hash.
 
 
-### Run the deployment
-After configuration is done, the current pipeline will run on every **push to the main branch**.
-Make sure to grant all necessary permissions to the pipeline, either using IAM Roles or Environment Variables.
-
-
-### Confirm
-Go to the logs.
-You should see something like
-`Processing 0 deposit events in blocks: 3422205 to 3422209` - this is the log that parses the blocks in search of bridging events. That means that relayer is up and listening.
-
-
-
 ## Other
 
 #### To change the number of relayers to deploy
 Amount of IDS in array set amount of relayers to be deployed.
 
 #### Relayer shared configuration
-Relayer configuration is done with `--config-url` flag on Relayer start and can be changed [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_TESTNET.j2#L23)
+Relayer configuration is done with `--config-url` flag on Relayer start and can be changed [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_STAGE_EXT.j2#L23)
 This flag sets up shared configuration IPNS URL that is used by all Relayers in the MPC network and provided by Sygma.
 More on [shared configuration]() <-- TODO add a link when shared config doc is ready
 
-#### Log Configuration
-Log configuration in `ecs` directory [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/ae7f2c11af64f517003d2b4c1de00167255cb031/ecs/task_definition_TESTNET.j2#L78).<br>
-We use Datadog Log management and is configured [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/ae7f2c11af64f517003d2b4c1de00167255cb031/ecs/task_definition_TESTNET.j2#L105). <br>
-TODO --> Set your Datadog API Key [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/ae7f2c11af64f517003d2b4c1de00167255cb031/ecs/task_definition_TESTNET.j2#L160)
-
 
 ### OTLP AGENT 
-We use OpenTelemetry Agent as a sidecar container for aggragting relayers metrics, for now. Read the followings to build the OpenTelemetry Agent
+We use OpenTelemetry Agent as a sidecar container for aggregating relayers metrics, for now. Read the followings to build the OpenTelemetry Agent
 
 **Two stages are required for the configuration**
-- Building OpenTemetry Agent
-- Configuring Task Defintion for ecs users
+- Building OpenTelemetry Agent
+- Configuring Task Definition for ecs users
 
-#### Building OpenTemetry Agent
-See the otlp-agent dirctory [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/tree/main/otlp-agent) br
+#### Building OpenTelemetry Agent
+See the otlp-agent directory [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/tree/main/otlp-agent) br
 The agent require three major files
 - Builder: `otlp-builder.yml`
 - Config File: `otlp-config.yml`
 - Dockerfile
 
 
-#### Build The Otlp Agent
+#### Build The OTLP Agent
 The otlp-agent directory contains a CI workflow in .github directory to automate the build process. [Here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/otlp-agent/.github/workflows/opentelemetry.yaml) is GitHub CI that build the image.
 You can use it as an example or use our build system of choice.
 
-After you have built your image, you should change [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_TESTNET.j2#L200) for your image path
+After you have built your image, you should change [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_STAGE_EXT.j2#L200) for your image path
 
 #### The Integration of the OpenTelemetry Agent
-See the task Definition section for the integration [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/e83bcc4eaf243ed52ff2404d2bf1bda150c36179/ecs/task_definition_TESTNET.j2#L199)
+See the task Definition section for the integration [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_STAGE_EXT.j2#L199)
 
 The Otlp Agent endpoint must be set on the Relayers as environment variable
 ```
                "name": "SYG_RELAYER_OPENTELEMETRYCOLLECTORURL",
                "value": "http://localhost:4318"
 ```
-See [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/31a2a02d678d3f6940b09ac4876efe158495e950/ecs/task_definition_TESTNET.j2#L38)
+See [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_STAGE_EXT.j2#L38)
 
 For easy reference, the env variables should be Organisation name with the environment to differentiate Relayers on the network.
-For `SYG_RELAYER_ENV` use TESTNET if it is a testnet instance and `MAINNET` if it is a production. Change it [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_TESTNET.j2#L47)
-For `SYG_RELAYER_ID` we need to make sure that it is unique for all relayers. So make sure that you have consulted with Sygma team about proper relayerid. Change it [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_TESTNET.j2#L43)
+For `SYG_RELAYER_ENV` use TESTNET if it is a testnet instance and `MAINNET` if it is a production. Change it [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_STAGE_EXT.j2#L47)
+For `SYG_RELAYER_ID` we need to make sure that it is unique for all relayers. So make sure that you have consulted with Sygma team about proper relayerid. Change it [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_STAGE_EXT.j2#L43)
 ```
                "name": "SYG_RELAYER_ID",
                "value": "{{ relayerId }}"
@@ -264,11 +267,11 @@ For `SYG_RELAYER_ID` we need to make sure that it is unique for all relayers. So
 ```
 
 #### Sharing metrics with Sygma
-FOr sharing metrics you would need to use DataDog API key provided by Sygma team. Set this key to DD_API_KEY env variable.  In task definition we are using ssm secrt store for [this](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/31a2a02d678d3f6940b09ac4876efe158495e950/ecs/task_definition_TESTNET.j2#L165)
+For sharing metrics you would need to use DataDog API key provided by Sygma team. Set this key to DD_API_KEY env variable.  In task definition we are using ssm secret store for [this](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/31a2a02d678d3f6940b09ac4876efe158495e950/ecs/task_definition_STAGE_EXT.j2#L165)
 
 #### Private Repository Access
-Configure [this](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/31a2a02d678d3f6940b09ac4876efe158495e950/ecs/task_definition_TESTNET.j2#L201) as per your organisation. 
-You may chose to remove [this](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/31a2a02d678d3f6940b09ac4876efe158495e950/ecs/task_definition_TESTNET.j2#L201) for accessing private reposiroty. 
+Configure [this](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_STAGE_EXT.j2#L201) as per your organisation.
+You may chose to remove [this](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_STAGE_EXT.j2#L201) for accessing private repository.
 
 
-The Sygma Team Highly Recomend to use private repository for the otlp agent
+The Sygma Team Highly Recommend to use private repository for the otlp agent
