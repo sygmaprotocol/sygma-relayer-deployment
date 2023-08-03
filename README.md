@@ -2,7 +2,8 @@
 This guide is a step-by-step manual that will help you deploy Sygma Relayer and join the Sygma Bridge MPC consensus.
 *Note: This process is not permissionless and should be agreed upon with the Sygma team in advance. For more information please visit [website](https://buildwithsygma.com/)*
 
-This deployment guide is based on assumptions that the user will use AWS as an infrastructure provider and will use GitHub Actions as a deployment pipeline. Although this guide is deadlocked for now, it is not meant to be like that so we are encouraging to use any providers of your choice.
+This deployment guide is based on assumptions that the user will use AWS as an infrastructure provider and GitHub Actions as a deployment pipeline.
+
 If you want to use K8S please refer to [Bware K8s deployment guide](https://github.com/bwarelabs/sygma-relayer-k8s-deployment)
 
 _### While most of the code can be reused we still highly encourage you to consider this repo to be a guide and a demo. It is expected that you will need to change some of TF or Task Definition variables according to your needs._
