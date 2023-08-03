@@ -3,6 +3,7 @@ This guide is a step-by-step manual that will help you deploy Sygma Relayer and 
 *Note: This process is not permissionless and should be agreed upon with the Sygma team in advance. For more information please visit [website](https://buildwithsygma.com/)*
 
 This deployment guide is based on assumptions that the user will use AWS as an infrastructure provider and will use GitHub Actions as a deployment pipeline. Although this guide is deadlocked for now, it is not meant to be like that so we are encouraging to use any providers of your choice.
+If you want to use K8S please refer to [Bware K8s deployment guide](https://github.com/bwarelabs/sygma-relayer-k8s-deployment)
 
 _### While most of the code can be reused we still highly encourage you to consider this repo to be a guide and a demo. It is expected that you will need to change some of TF or Task Definition variables according to your needs._
 
@@ -84,7 +85,7 @@ The configuration for the relayers is in the folder `ecs`. For ECS we configure 
 
 **Change EFS configuration according to your provision results.**
 
-[efsVolumeConfiguration](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_STAGE_EXT.j2#227) - set this value to the EFS File system ID that was created (should have `relayers-efs-Demo` name by default)
+[efsVolumeConfiguration](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_PARTNERS.j2#227) - set this value to the EFS File system ID that was created (should have `relayers-efs-Demo` name by default)
 
 
 
@@ -98,9 +99,22 @@ Set the next secret variables in GitHub Secret variables section. They will be u
  `AWS_ARN` - ARN of the user that will be deploying the Relayer
  `AWS_ROLE` - the name of IAM Role that will perform deployment
 
-#### Cofigurate other GitHub action variables.
+#### Cofigurate GitHub action variables.
 
-You can also configure different [env variables](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/.github/workflows/deploy_ecs_STAGE_EXT.yml#L11)
+Task definition variables are configurated as ENV variables for [GitHub actions](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/.github/workflows/deploy_ecs_STAGE_EXT.yml#L11)
+
+For easy reference, the env variables should be Organisation name with the environment to differentiate Relayers on the network.
+For `SYG_RELAYER_ENV` use `TESTNET` if it is a testnet instance and `MAINNET` if it is a production. Change it [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_PARTNERS.j2#L47)
+For `SYG_RELAYER_ID` we need to make sure that it is unique for all relayers. So make sure that you have consulted with Sygma team about proper relayerid. Change it [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_PARTNERS.j2#L43)
+```
+               "name": "SYG_RELAYER_ID",
+               "value": "{{ relayerId }}"
+
+
+               "name": "SYG_RELAYER_ENV",
+               "value": "TESTNET"
+```
+
 
 ### Relayer configuration
 
@@ -182,9 +196,9 @@ Note:
 
 
 ### Log Configuration
-Log configuration in `ecs` directory [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_STAGE_EXT.j2#L83).<br>
-We use Datadog Log management and is configured [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_STAGE_EXT.j2#L110). <br>
-Set your Datadog API Key [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_STAGE_EXT.j2#L98)
+Log configuration in `ecs` directory [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_PARTNERS.j2#L83).<br>
+We use Datadog Log management and is configured [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_PARTNERS.j2#L110). <br>
+Set your Datadog API Key [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_PARTNERS.j2#L98)
 
 
 ### Run the deployment
@@ -218,9 +232,9 @@ After all the information is provided Sygma team will regenerate Topology Map an
 Amount of IDS in array set amount of relayers to be deployed.
 
 #### Relayer shared configuration
-Relayer configuration is done with `--config-url` flag on Relayer start and can be changed [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_STAGE_EXT.j2#L23)
+Relayer configuration is done with `--config-url` flag on Relayer start and can be changed [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_PARTNERS.j2#L23)
 This flag sets up shared configuration IPNS URL that is used by all Relayers in the MPC network and provided by Sygma.
-More on [shared configuration]() <-- TODO add a link when shared config doc is ready
+More on [shared configuration](https://github.com/sygmaprotocol/sygma-shared-configuration)
 
 
 ### OTLP AGENT 
@@ -242,36 +256,24 @@ The agent require three major files
 The otlp-agent directory contains a CI workflow in .github directory to automate the build process. [Here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/otlp-agent/.github/workflows/opentelemetry.yaml) is GitHub CI that build the image.
 You can use it as an example or use our build system of choice.
 
-After you have built your image, you should change [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_STAGE_EXT.j2#L200) for your image path
+After you have built your image, you should change [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_PARTNERS.j2#L200) for your image path
 
 #### The Integration of the OpenTelemetry Agent
-See the task Definition section for the integration [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_STAGE_EXT.j2#L199)
+See the task Definition section for the integration [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_PARTNERS.j2#L199)
 
 The Otlp Agent endpoint must be set on the Relayers as environment variable
 ```
                "name": "SYG_RELAYER_OPENTELEMETRYCOLLECTORURL",
                "value": "http://localhost:4318"
 ```
-See [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_STAGE_EXT.j2#L38)
-
-For easy reference, the env variables should be Organisation name with the environment to differentiate Relayers on the network.
-For `SYG_RELAYER_ENV` use TESTNET if it is a testnet instance and `MAINNET` if it is a production. Change it [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_STAGE_EXT.j2#L47)
-For `SYG_RELAYER_ID` we need to make sure that it is unique for all relayers. So make sure that you have consulted with Sygma team about proper relayerid. Change it [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_STAGE_EXT.j2#L43)
-```
-               "name": "SYG_RELAYER_ID",
-               "value": "{{ relayerId }}"
-            
-            
-               "name": "SYG_RELAYER_ENV",
-               "value": "TESTNET"
-```
+See [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_PARTNERS.j2#L38)
 
 #### Sharing metrics with Sygma
-For sharing metrics you would need to use DataDog API key provided by Sygma team. Set this key to DD_API_KEY env variable.  In task definition we are using ssm secret store for [this](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/31a2a02d678d3f6940b09ac4876efe158495e950/ecs/task_definition_STAGE_EXT.j2#L165)
+For sharing metrics you would need to use DataDog API key provided by Sygma team. Set this key to DD_API_KEY env variable.  In task definition we are using ssm secret store for [this](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/31a2a02d678d3f6940b09ac4876efe158495e950/ecs/task_definition_PARTNERS.j2#L165)
 
 #### Private Repository Access
-Configure [this](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_STAGE_EXT.j2#L201) as per your organisation.
-You may chose to remove [this](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_STAGE_EXT.j2#L201) for accessing private repository.
+Configure [this](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_PARTNERS.j2#L201) as per your organisation.
+You may chose to remove [this](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_PARTNERS.j2#L201) for accessing private repository.
 
 
 The Sygma Team Highly Recommend to use private repository for the otlp agent
