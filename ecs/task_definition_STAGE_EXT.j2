@@ -3,7 +3,7 @@
    "containerDefinitions": [ 
       { 
          "name": "{{ relayerName }}-{{ relayerId }}-container-{{ appTag }}",
-         "image": "ghcr.io/sygmaprotocol/sygma-relayer:latest",
+         "image": "ghcr.io/sygmaprotocol/sygma-relayer:{{ imageTag }}",
          "portMappings": [ 
             { 
                "containerPort": 9000,
@@ -45,6 +45,18 @@
             {
                "name": "SYG_RELAYER_ENV",
                "value": {{ env }}
+            },
+                        {
+               "name": "SYG_RELAYER_MPCCONFIG_KEYSHAREPATH",
+               "value": "/mount/r{{ relayerId }}.keyshare"
+            },
+            {
+               "name": "SYG_RELAYER_MPCCONFIG_TOPOLOGYCONFIGURATION_PATH",
+               "value": "/mount/r{{ relayerId }}-top.json"
+            },
+            {
+               "name": "SYG_RELAYER_MPCCONFIG_FROSTKEYSHAREPATH",
+               "value": "/mount/r{{ relayerId }}-frost.keyshare"
             }
          ],
          "mountPoints": [
@@ -59,17 +71,9 @@
                "name": "SYG_RELAYER_MPCCONFIG_KEY",
                "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/chainbridge/relayers/relayer-{{ relayerId }}/SYG_RELAYER_MPCCONFIG_KEY"
             },
-            {
-               "name": "SYG_RELAYER_MPCCONFIG_KEYSHAREPATH",
-               "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/chainbridge/relayers/relayer-{{ relayerId }}/SYG_RELAYER_MPCCONFIG_KEYSHAREPATH"
-            },
             { 
                "name": "SYG_RELAYER_MPCCONFIG_TOPOLOGYCONFIGURATION_ENCRYPTIONKEY",
                "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/chainbridge/relayers/relayer/SYG_RELAYER_MPCCONFIG_TOPOLOGYCONFIGURATION_ENCRYPTIONKEY"
-            },
-            {
-               "name": "SYG_RELAYER_MPCCONFIG_TOPOLOGYCONFIGURATION_PATH",
-               "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/chainbridge/relayers/relayer-{{ relayerId }}/SYG_RELAYER_MPCCONFIG_TOPOLOGYCONFIGURATION_PATH"
             },
             {
                "name": "SYG_RELAYER_MPCCONFIG_TOPOLOGYCONFIGURATION_URL",
@@ -85,7 +89,7 @@
             "options": {
                "provider": "ecs",
                "dd_service": "DEVNET-relayers-{{ relayerId }}",
-               "dd_tags": "env:{{ env }},project:chainbridge,relayerid:{{ relayerId }}",
+               "dd_tags": "env:{{ env }},project:chainbridge,relayerid:{{ relayerId }},image:{{ imageTag }}",
                "dd_message_key": "log",
                "Host": "http-intake.logs.datadoghq.com",
                "TLS": "on",
