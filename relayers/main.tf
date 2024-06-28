@@ -6,10 +6,10 @@ terraform {
     }
   }
   # backend "remote" {
-  #   organization = "ChainSafe"
+  #   organization = "Tangle"
 
   #   workspaces {
-  #     prefix = "chainbridge-relayer-"
+  #     prefix = "tangle-relayer-"
   #   }
   # }
 }

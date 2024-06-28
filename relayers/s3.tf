@@ -1,8 +1,8 @@
 resource "aws_s3_bucket" "config" {
-  bucket = format("%s-%s", var.project_name, lower(var.env))
+  bucket = format("%s-%s-tangle", var.project_name, lower(var.env))
 
   tags = {
-    Name = format("%s-%s", var.project_name, lower(var.env))
+    Name = format("%s-%s-tangle", var.project_name, lower(var.env))
   }
 }
 resource "aws_s3_bucket_versioning" "versioning" {
