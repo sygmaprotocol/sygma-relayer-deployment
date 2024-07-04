@@ -176,7 +176,12 @@ You should **manually** set this parameter according to the following descriptio
 - **SYG_RELAYER_MPCCONFIG_TOPOLOGYCONFIGURATION_PATH**
 
     Example: `/mount/r1-top.json` Should be unique per relayer. (eg /mount/r1-top.json, /mount/r2-top.json, etc). Should be persistent filesystem.
-
+    ```json
+        {
+          "name": "SYG_RELAYER_MPCCONFIG_TOPOLOGYCONFIGURATION_PATH",
+          "value": "/mount/r1-top.json"
+        }
+    ```
 - **SYG_RELAYER_MPCCONFIG_TOPOLOGYCONFIGURATION_ENCRYPTIONKEY**
 
     AES secret key that is used to encrypt libp2p network topology.
