@@ -122,7 +122,7 @@ For `SYG_RELAYER_ID` we need to make sure that it is unique for all relayers. So
 We use SSM to hold all of our secrets. To access it, go to your AWS Account, in the Search bar type `SSM`. Go into the Systems Manager Service. On the left side menu, go into Parameter Store.
 Now you can create any secrets that you want, and then reference it in the `secrets` section in the Task Definition.
 
-During the infrastructure, provisioning terraforms scripts will create a number of secret parameters in the [Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html).
+- Follow this [Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html) doc to create relevant secrets. 
 You should **manually** set this parameter according to the following description
 
 - **SYG_CHAINS-** domain configuration. One configuration for all domains (networks). **JUST AN EXAMPLE CONFIRM LIST OF NETWORKS WITH SYGMA TEAM DEPENDS on EVN**
