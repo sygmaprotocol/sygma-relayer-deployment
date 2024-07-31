@@ -75,3 +75,17 @@ resource "aws_lb_listener" "tcp" {
     type             = "forward"
   }
 }
+
+resource "aws_lb_listener" "tls" {
+  count = var.relayers
+  load_balancer_arn = aws_lb.main[count.index].id
+  port              = "443"
+  protocol          = "TLS"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+  certificate_arn   = data.aws_acm_certificate.chainsafe_io.arn
+  default_action {
+    target_group_arn = aws_lb_target_group.http[count.index].id
+    type             = "forward"
+  }
+
+}
