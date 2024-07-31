@@ -29,6 +29,6 @@ data "aws_subnets" "ec2_public_subnets" {
 }
 
 data "aws_acm_certificate" "chainsafe_io" {
-  domain   = "*.chainsafe.io"
+  domain   = "*.chainsafe.io"  // use your own domain here
   statuses = ["ISSUED"]
 }
