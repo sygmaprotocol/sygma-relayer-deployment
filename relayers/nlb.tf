@@ -4,6 +4,7 @@ resource "aws_lb" "main" {
   internal                         = var.is_lb_internal
   load_balancer_type               = "network"
   subnets                          = data.aws_subnets.ec2_public_subnets.ids
+  security_groups                  = [aws_security_group.lb.id]
   enable_cross_zone_load_balancing = true
   enable_deletion_protection       = var.lb_delete_protection
 }
