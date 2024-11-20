@@ -258,11 +258,45 @@ The agent require three major files
 - Dockerfile
 
 
-#### Build The OTLP Agent
-The otlp-agent directory contains a CI workflow in .github directory to automate the build process. [Here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/otlp-agent/.github/workflows/opentelemetry.yaml) is GitHub CI that build the image.
-You can use it as an example or use our build system of choice.
+#### The OTLP Agent
+Configure The OLTP Agent as a sidecar container on the ECS Task definition file
+```
+{
+  "name": "otel-collector",
+  "image": "ghcr.io/sygmaprotocol/sygma-opentelemetry-collector:v1.0.3",
+  "essential": true,
+  "secrets": [
+    {
+      "name": "GRAFANA_CLOUD",
+      "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/sygma/auth/secrets"
+    },
+    {
+      "name": "USER_ID",
+      "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/sygma/auth/userid"
+    },
+    {
+      "name": "ENDPOINT",
+      "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/sygma/logs/grafana/endpoint"
+    }
+  ],
+  "logConfiguration": {
+    "logDriver": "awslogs",
+    "options": {
+      "awslogs-group": "/ecs/{{ relayerName }}-{{ relayerId }}-{{ TESTNET }}",
+      "awslogs-create-group": "True",
+      "awslogs-region": "{{ awsRegion }}",
+      "awslogs-stream-prefix": "ecs"
+    }
+  }
+}
 
-After you have built your image, you should change [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_PARTNERS.j2#L200) for your image path
+```
+For K8s or other environment
+Here is the image ghcr.io/sygmaprotocol/sygma-opentelemetry-collector:v1.0.3
+- Run the Image as a sidecar container
+- set this variables `GRAFANA_CLOUD` `USER_ID` `ENDPOINT`
+- Sygma will share the values of these variables through secure channels
+
 
 #### The Integration of the OpenTelemetry Agent
 See the task Definition section for the integration [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_PARTNERS.j2#L199)
@@ -282,4 +316,4 @@ Configure [this](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/
 You may chose to remove [this](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_PARTNERS.j2#L201) for accessing private repository.
 
 
-The Sygma Team Highly Recommend to use private repository for the otlp agent
+The Sygma Team Highly recommend to be security conscious while storing the shared credentials - store the credentials in private and secure environment with least previlige. Use Vault, AWS secrets manager for storing crednetials. 
