@@ -1,8 +1,8 @@
 {
-   "family": "{{ relayerName }}-{{ relayerId }}-container-{{ appTag }}",
+   "family": "{{ relayerName }}-{{ relayerId }}-container-{{ TESTNET }}",
    "containerDefinitions": [ 
       { 
-         "name": "{{ relayerName }}-{{ relayerId }}-container-{{ appTag }}",
+         "name": "{{ relayerName }}-{{ relayerId }}-container-{{ TESTNET }}",
          "image": "ghcr.io/sygmaprotocol/sygma-relayer:{{ set Sygma release version }}",
          "portMappings": [ 
             { 
@@ -91,8 +91,8 @@
               "remove_keys": "container_id,ecs_task_arn",
               "label_keys": "$source,$container_name,$ecs_task_definition,$ecs_cluster",
               "Port": "443",
-              "host": "loki.chainsafe.dev",
-              "http_user": "infra",
+              "host": " { request for the Loging ENDPOINT } ",
+              "http_user": " { request for the USER_ID } ",
               "tls": "on",
               "line_format": "json",
               "Name": "loki",
@@ -161,7 +161,7 @@
          "logConfiguration": {
             "logDriver": "awslogs",
                "options": {
-                  "awslogs-group": "/ecs/{{ relayerName }}-{{ relayerId }}-{{ appTag }}",
+                  "awslogs-group": "/ecs/{{ relayerName }}-{{ relayerId }}-{{ TESTNET }}",
                   "awslogs-create-group": "True",
                   "awslogs-region": "{{ awsRegion }}",
                   "awslogs-stream-prefix": "ecs"
