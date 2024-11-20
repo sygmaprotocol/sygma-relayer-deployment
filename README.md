@@ -242,21 +242,71 @@ Relayer configuration is done with `--config-url` flag on Relayer start and can 
 This flag sets up shared configuration IPNS URL that is used by all Relayers in the MPC network and provided by Sygma.
 More on [shared configuration](https://github.com/sygmaprotocol/sygma-shared-configuration)
 
+## Logs and Metrics
 
-### OTLP AGENT 
-We use OpenTelemetry Agent as a sidecar container for aggregating relayers metrics, for now. Read the followings to build the OpenTelemetry Agent
+### Logs
+Configure Fluent Bit as follows
+- Log Router 
+- Log Configuration
 
-**Two stages are required for the configuration**
-- Building OpenTelemetry Agent
-- Configuring Task Definition for ecs users
-
-#### Building OpenTelemetry Agent
-See the otlp-agent directory [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/tree/main/otlp-agent) br
-The agent require three major files
-- Builder: `otlp-builder.yml`
-- Config File: `otlp-config.yml`
-- Dockerfile
-
+1.  Log Container
+```
+      {
+         "name": "log_router",
+         "image": "grafana/fluent-bit-plugin-loki:2.9.3-amd64",
+         "cpu": 0,
+         "memoryReservation": 50,
+         "portMappings": [],
+         "essential": true,
+         "environment": [],
+         "mountPoints": [],
+         "volumesFrom": [],
+         "user": "0",
+         "logConfiguration": {
+            "logDriver": "awslogs",
+            "options": {
+               "awslogs-group": "/ecs/relayer-{{ relayerId }}-TESTNET",
+               "awslogs-create-group": "true",
+               "awslogs-region": "{{ awsRegion }}",
+               "awslogs-stream-prefix": "ecs"
+               }
+         },
+         "systemControls": [],
+         "firelensConfiguration": {
+            "type": "fluentbit",
+            "options": {
+               "enable-ecs-log-metadata": "true"
+            }
+         }
+      },
+```
+2. Log Configuration - configure the Relayer container with this lines of codes
+see here for example
+```
+         "logConfiguration": {
+            "logDriver": "awsfirelens",
+            "options": {
+              "tls.verify": "on",
+              "remove_keys": "container_id,ecs_task_arn",
+              "label_keys": "$source,$container_name,$ecs_task_definition,$ecs_cluster",
+              "Port": "443",
+              "host": " { request for the endpoint } ",
+              "http_user": " { request for the userID } ",
+              "tls": "on",
+              "line_format": "json",
+              "Name": "loki",
+              "labels": "job=fluent-bit,env=testnet,project=sygma,service_name=relayer-{{ relayerId }}-container-TESTNET,image={{ imageTag }}"
+          },
+          "secretOptions": [
+              {
+                "name": "http_passwd",
+                "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/sygma/logs/grafana"
+              }
+            ]
+         },
+```
+### OTLP AGENT for Metrics
+We use OpenTelemetry Agent as a sidecar container for aggregating relayers metrics, for now. 
 
 #### The OTLP Agent
 Configure The OLTP Agent as a sidecar container on the ECS Task definition file
@@ -295,7 +345,7 @@ For K8s or other environment
 Here is the image ghcr.io/sygmaprotocol/sygma-opentelemetry-collector:v1.0.3
 - Run the Image as a sidecar container
 - set this variables `GRAFANA_CLOUD` `USER_ID` `ENDPOINT`
-- Sygma will share the values of these variables through secure channels
+- Sygma will share the values of these variables through secure channel(s)
 
 
 #### The Integration of the OpenTelemetry Agent
