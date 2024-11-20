@@ -249,7 +249,7 @@ Configure Fluent Bit as follows
 - Log Router 
 - Log Configuration
 
-1.  Log Container
+1.  Log Router
 ```
       {
          "name": "log_router",
