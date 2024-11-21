@@ -242,27 +242,111 @@ Relayer configuration is done with `--config-url` flag on Relayer start and can 
 This flag sets up shared configuration IPNS URL that is used by all Relayers in the MPC network and provided by Sygma.
 More on [shared configuration](https://github.com/sygmaprotocol/sygma-shared-configuration)
 
+## Logs and Metrics
 
-### OTLP AGENT 
-We use OpenTelemetry Agent as a sidecar container for aggregating relayers metrics, for now. Read the followings to build the OpenTelemetry Agent
+### Logs
+Configure Fluent Bit as follows
+- Log Router 
+- Log Configuration
 
-**Two stages are required for the configuration**
-- Building OpenTelemetry Agent
-- Configuring Task Definition for ecs users
+1.  Log Router
+```
+      {
+         "name": "log_router",
+         "image": "grafana/fluent-bit-plugin-loki:2.9.3-amd64",
+         "cpu": 0,
+         "memoryReservation": 50,
+         "portMappings": [],
+         "essential": true,
+         "environment": [],
+         "mountPoints": [],
+         "volumesFrom": [],
+         "user": "0",
+         "logConfiguration": {
+            "logDriver": "awslogs",
+            "options": {
+               "awslogs-group": "/ecs/relayer-{{ relayerId }}-TESTNET",
+               "awslogs-create-group": "true",
+               "awslogs-region": "{{ awsRegion }}",
+               "awslogs-stream-prefix": "ecs"
+               }
+         },
+         "systemControls": [],
+         "firelensConfiguration": {
+            "type": "fluentbit",
+            "options": {
+               "enable-ecs-log-metadata": "true"
+            }
+         }
+      },
+```
+2. Log Configuration - configure the Relayer container with this lines of codes
+see here for example
+```
+         "logConfiguration": {
+            "logDriver": "awsfirelens",
+            "options": {
+              "tls.verify": "on",
+              "remove_keys": "container_id,ecs_task_arn",
+              "label_keys": "$source,$container_name,$ecs_task_definition,$ecs_cluster",
+              "Port": "443",
+              "host": " { request for the endpoint } ",
+              "http_user": " { request for the userID } ",
+              "tls": "on",
+              "line_format": "json",
+              "Name": "loki",
+              "labels": "job=fluent-bit,env=testnet,project=sygma,service_name=relayer-{{ relayerId }}-container-TESTNET,image={{ imageTag }}"
+          },
+          "secretOptions": [
+              {
+                "name": "http_passwd",
+                "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/sygma/logs/grafana"
+              }
+            ]
+         },
+```
+### OTLP AGENT for Metrics
+We use OpenTelemetry Agent as a sidecar container for aggregating relayers metrics, for now. 
 
-#### Building OpenTelemetry Agent
-See the otlp-agent directory [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/tree/main/otlp-agent) br
-The agent require three major files
-- Builder: `otlp-builder.yml`
-- Config File: `otlp-config.yml`
-- Dockerfile
+#### The OTLP Agent
+Configure The OLTP Agent as a sidecar container on the ECS Task definition file
+```
+{
+  "name": "otel-collector",
+  "image": "ghcr.io/sygmaprotocol/sygma-opentelemetry-collector:v1.0.3",
+  "essential": true,
+  "secrets": [
+    {
+      "name": "GRAFANA_CLOUD",
+      "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/sygma/auth/secrets"
+    },
+    {
+      "name": "USER_ID",
+      "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/sygma/auth/userid"
+    },
+    {
+      "name": "ENDPOINT",
+      "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/sygma/logs/grafana/endpoint"
+    }
+  ],
+  "logConfiguration": {
+    "logDriver": "awslogs",
+    "options": {
+      "awslogs-group": "/ecs/{{ relayerName }}-{{ relayerId }}-{{ TESTNET }}",
+      "awslogs-create-group": "True",
+      "awslogs-region": "{{ awsRegion }}",
+      "awslogs-stream-prefix": "ecs"
+    }
+  }
+}
 
+```
+For K8s or other environment
+Here is the image ghcr.io/sygmaprotocol/sygma-opentelemetry-collector:v1.0.3
+- Run the Image as a sidecar container
+- set this variables `GRAFANA_CLOUD` `USER_ID` `ENDPOINT`
+- Sygma will share the values of these variables through secure channel(s)
 
-#### Build The OTLP Agent
-The otlp-agent directory contains a CI workflow in .github directory to automate the build process. [Here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/otlp-agent/.github/workflows/opentelemetry.yaml) is GitHub CI that build the image.
-You can use it as an example or use our build system of choice.
-
-After you have built your image, you should change [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_PARTNERS.j2#L200) for your image path
 
 #### The Integration of the OpenTelemetry Agent
 See the task Definition section for the integration [here](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_PARTNERS.j2#L199)
@@ -282,4 +366,4 @@ Configure [this](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/
 You may chose to remove [this](https://github.com/sygmaprotocol/sygma-relayer-deployment/blob/main/ecs/task_definition_PARTNERS.j2#L201) for accessing private repository.
 
 
-The Sygma Team Highly Recommend to use private repository for the otlp agent
+The Sygma Team Highly recommend to be security conscious while storing the shared credentials - store the credentials in private and secure environment with least previlige. Use Vault, AWS secrets manager for storing crednetials. 

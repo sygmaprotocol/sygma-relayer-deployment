@@ -1,8 +1,8 @@
 {
-   "family": "{{ relayerName }}-{{ relayerId }}-container-{{ appTag }}",
+   "family": "{{ relayerName }}-{{ relayerId }}-container-{{ TESTNET }}",
    "containerDefinitions": [ 
       { 
-         "name": "{{ relayerName }}-{{ relayerId }}-container-{{ appTag }}",
+         "name": "{{ relayerName }}-{{ relayerId }}-container-{{ TESTNET }}",
          "image": "ghcr.io/sygmaprotocol/sygma-relayer:{{ set Sygma release version }}",
          "portMappings": [ 
             { 
@@ -40,7 +40,7 @@
             },
             {
                "name": "SYG_RELAYER_ID",
-               "value": "5"
+               "value": "{{ relayerId }}"
             },
             {
                "name": "SYG_RELAYER_ENV",
@@ -87,138 +87,85 @@
          "logConfiguration": {
             "logDriver": "awsfirelens",
             "options": {
-               "provider": "ecs",
-               "dd_service": "{{ env }}-relayers-{{ relayerId }}",
-               "dd_tags": "env:{{ env }},project:chainbridge,relayerid:{{ relayerId }},image:{{ set Sygma release version }}",
-               "dd_message_key": "log",
-               "Host": "http-intake.logs.datadoghq.com",
-               "TLS": "on",
-               "dd_source": "{{ relayerName }}-{{ relayerId }}-container-{{ appTag }}", 
-               "Name": "datadog"
-            },
-            "secretOptions": [
-               {
-                  "name": "apikey",
-                  "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/common/datadog/key"
-               }
+              "tls.verify": "on",
+              "remove_keys": "container_id,ecs_task_arn",
+              "label_keys": "$source,$container_name,$ecs_task_definition,$ecs_cluster",
+              "Port": "443",
+              "host": " { request for the Loging ENDPOINT } ",
+              "http_user": " { request for the USER_ID } ",
+              "tls": "on",
+              "line_format": "json",
+              "Name": "loki",
+              "labels": "job=fluent-bit,env=testnet,project=sygma,service_name=relayer-{{ relayerId }}-container-TESTNET,image={{ imageTag }}"
+          },
+          "secretOptions": [
+              {
+                "name": "http_passwd",
+                "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/sygma/logs/grafana"
+              }
             ]
          },
-         "dependsOn": [
-            {
-               "containerName": "log_router",
-               "condition": "START"
-            }
-         ]
       },
       {
-      "name": "datadog-agent",
-      "image": "gcr.io/datadoghq/agent:latest",
-      "essential": true,
-      "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-          "awslogs-group": "/ecs/{{ relayerName }}-{{ relayerId }}-{{ appTag }}",
-          "awslogs-region": "{{ awsRegion }}",
-          "awslogs-stream-prefix": "ecs"
-        }
-      },
-      "healthCheck": {
-        "retries": 3,
-        "command": ["CMD-SHELL","agent health"],
-        "timeout": 5,
-        "interval": 30,
-        "startPeriod": 15
-      },
-      "portMappings": [
-        {
-          "hostPort": 8126,
-          "protocol": "tcp",
-          "containerPort": 8126
-        }
-      ],
-      "command": [],
-      "cpu": 0,
-      "environment": [
-        {
-          "name": "DD_APM_ENABLED",
-          "value": "true"
-        },
-        {
-          "name": "DD_APM_NON_LOCAL_TRAFFIC",
-          "value": "true"
-        },
-        {
-          "name": "DD_TAGS",
-          "value": "env:{{ env }},project:relayer-{{ relayerId }}"
-        },
-        {
-          "name": "DD_LOG_LEVEL",
-          "value": "INFO"
-        },
-        {
-          "name": "ECS_FARGATE",
-          "value": "true"
-        },
-        {
-          "name": "ENV",
-          "value": "{{ env }}"
-        }
-      ],
-      "secrets": [
-        {
-          "name": "DD_API_KEY",
-          "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/common/datadog/key"
-        }
-      ],
-      "mountPoints": [],
-      "volumesFrom": []
-    },
-    {
-      "name": "log_router",
-      "image": "amazon/aws-for-fluent-bit:latest",
-      "essential": true,
-      "firelensConfiguration": {
-        "type": "fluentbit",
-        "options": {
-            "enable-ecs-log-metadata": "true"
-        }
-      },
-      "logConfiguration": { 
-            "logDriver": "awslogs",
-            "options": { 
-               "awslogs-group": "/ecs/{{ relayerName }}-{{ relayerId }}-{{ appTag }}",
-               "awslogs-region": "{{ awsRegion }}",
-               "awslogs-stream-prefix": "ecs"
-            }
-         },
-         "portMappings": [],
-         "command": [],
+         "name": "log_router",
+         "image": "grafana/fluent-bit-plugin-loki:2.9.3-amd64",
          "cpu": 0,
+         "memoryReservation": 50,
+         "portMappings": [],
+         "essential": true,
          "environment": [],
          "mountPoints": [],
+         "volumesFrom": [],
          "user": "0",
-         "volumesFrom": []
+         "logConfiguration": {
+            "logDriver": "awslogs",
+            "options": {
+               "awslogs-group": "/ecs/relayer-{{ relayerId }}-TESTNET",
+               "awslogs-create-group": "true",
+               "awslogs-region": "{{ awsRegion }}",
+               "awslogs-stream-prefix": "ecs"
+               }
+         },
+         "systemControls": [],
+         "firelensConfiguration": {
+            "type": "fluentbit",
+            "options": {
+               "enable-ecs-log-metadata": "true"
+            }
+         }
       },
       {
          "name": "otel-collector",
-         "image": "ghcr.io/sygmaprotocol/sygma-opentelemetry-collector:latest",
-         "repositoryCredentials": {
-            "credentialsParameter": "arn:aws:secretsmanager:{{ awsRegion }}:{{ awsAccountId }}:secret:sygma/opentelemetry-Z1wcYA"
-         },
+         "image": "ghcr.io/sygmaprotocol/sygma-opentelemetry-collector:v1.0.3",
          "cpu": 0,
          "portMappings": [],
          "essential": true,
          "environment": [],
          "mountPoints": [],
          "volumesFrom": [],
+         "secrets": [
+            {
+               "name": "GRAFANA_CLOUD",
+               "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/sygma/basicauth/secrets"
+            },
+            {
+               "name": "USER_ID",
+               "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/sygma/basicauth/userid"
+            },
+            {
+               "name": "ENDPOINT",
+               "valueFrom": "arn:aws:ssm:{{ awsRegion }}:{{ awsAccountId }}:parameter/sygma/logs/grafana/endpoint"
+            }
+         ],
          "dockerLabels": {},
          "logConfiguration": {
             "logDriver": "awslogs",
                "options": {
-                  "awslogs-group": "/ecs/{{ relayerName }}-{{ relayerId }}-{{ appTag }}",
+                  "awslogs-group": "/ecs/{{ relayerName }}-{{ relayerId }}-{{ TESTNET }}",
+                  "awslogs-create-group": "True",
                   "awslogs-region": "{{ awsRegion }}",
                   "awslogs-stream-prefix": "ecs"
-                  }
+               }
          }
       }
    ],
